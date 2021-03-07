@@ -1,0 +1,16 @@
+port: 80
+appName: "purchase-svc"
+ginMode: "debug"
+nats:
+  clusterID: "test-cluster"
+  url: "nats://127.0.0.1:4222"
+  clientID: "" # should be overrided by env
+  queueGroup: ""
+  durableName: "purchase-svc-durable"
+  subscriberCount: 1
+rpcEndpoints:
+  authServerURL: ""
+  productServerURL: ""
+serviceOptions:
+  rps: 100
+  timeoutSecond: 10
