@@ -31,7 +31,7 @@ func main() {
 		ocagent.WithAddress(ocagentHost),
 		ocagent.WithServiceName("voting"))
 	if err != nil {
-		log.Fatalf("Failed to create ocagent-exporter: %v", err)
+		log.Fatalf("failed to create ocagent-exporter: %v", err)
 	}
 	trace.RegisterExporter(oce)
 
@@ -39,7 +39,7 @@ func main() {
 	if promPort != "" {
 		// Start prometheus server
 		go func() {
-			log.Printf("Starting prom metrics on PROM_PORT=[%s]", promPort)
+			log.Infof("starting prom metrics on PROM_PORT=[%s]", promPort)
 			http.Handle("/metrics", promhttp.Handler())
 			err := http.ListenAndServe(fmt.Sprintf(":%s", promPort), nil)
 			errs <- err
@@ -53,10 +53,7 @@ func main() {
 	defer broker.Publisher.Close()
 	defer broker.Subscriber.Close()
 	go func() {
-		err := server.Run()
-		if err != nil {
-			errs <- err
-		}
+		errs <- server.Run()
 	}()
 
 	// Catch shutdown
@@ -73,13 +70,16 @@ func main() {
 		defer cancel()
 		errs <- gracefulShutdown(ctx, server)
 	}()
-
-	log.Fatal(<-errs)
+	err = <-errs
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func gracefulShutdown(ctx context.Context, server *infrahttp.Server) error {
 	if err := server.Svr.Shutdown(ctx); err != nil {
 		return fmt.Errorf("error server shutdown: %v", err)
 	}
-	return fmt.Errorf("gracefully shutdowned")
+	log.Info("gracefully shutdowned")
+	return nil
 }
