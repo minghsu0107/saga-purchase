@@ -58,7 +58,10 @@ func main() {
 	// Catch shutdown
 	go func() {
 		sig := make(chan os.Signal, 1)
-		signal.Notify(sig, syscall.SIGINT, syscall.SIGQUIT)
+		// kill (no param) default send syscall.SIGTERM
+		// kill -2 is syscall.SIGINT
+		// kill -9 is syscall.SIGKILL but can't be catch, so don't need add it
+		signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
 		s := <-sig
 
 		// graceful shutdown
