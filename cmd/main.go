@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"os"
@@ -49,7 +50,9 @@ func main() {
 	}
 	go func() {
 		err := server.Run()
-		errs <- err
+		if err != nil {
+			errs <- err
+		}
 	}()
 
 	// Catch shutdown
@@ -57,7 +60,15 @@ func main() {
 		sig := make(chan os.Signal, 1)
 		signal.Notify(sig, syscall.SIGINT, syscall.SIGQUIT)
 		s := <-sig
-		errs <- fmt.Errorf("caught signal %v", s)
+
+		// graceful shutdown
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err := server.Svr.Shutdown(ctx); err != nil {
+			errs <- fmt.Errorf("error server shutdown: %v", err)
+		} else {
+			errs <- fmt.Errorf("caught signal: %v, gracefully shutdowned", s)
+		}
 	}()
 
 	log.Fatal(<-errs)

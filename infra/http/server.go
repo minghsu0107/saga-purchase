@@ -3,6 +3,7 @@ package http
 import (
 	"context"
 	"io"
+	"net/http"
 
 	watermillHTTP "github.com/ThreeDotsLabs/watermill-http/pkg/http"
 	"github.com/gin-gonic/gin"
@@ -16,6 +17,7 @@ type Server struct {
 	Config         *conf.Config
 	Engine         *gin.Engine
 	Router         *Router
+	Svr            *http.Server
 	sseRouter      *watermillHTTP.SSERouter
 	jwtAuthChecker *middleware.JWTAuthChecker
 }
@@ -72,6 +74,13 @@ func (s *Server) RegisterRoutes() {
 func (s *Server) Run() error {
 	s.RegisterRoutes()
 
-	Addr := ":" + s.Config.Port
-	return s.Engine.Run(Addr)
+	s.Svr = &http.Server{
+		Addr:    ":" + s.Config.Port,
+		Handler: s.Engine,
+	}
+	err := s.Svr.ListenAndServe()
+	if err != nil && err != http.ErrServerClosed {
+		return err
+	}
+	return nil
 }
