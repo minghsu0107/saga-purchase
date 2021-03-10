@@ -6,6 +6,7 @@ import (
 
 	grpc_retry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
 	conf "github.com/minghsu0107/saga-purchase/config"
+	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 )
@@ -22,6 +23,7 @@ type ProductConn struct {
 
 // NewAuthConn returns a grpc client connection for AuthRepository
 func NewAuthConn(config *conf.Config) (*AuthConn, error) {
+	log.Info("connecting to grpc auth service...")
 	conn, err := newGRPCConn(config.RPCEndpoints.AuthServerURL)
 	if err != nil {
 		return nil, err
@@ -33,6 +35,7 @@ func NewAuthConn(config *conf.Config) (*AuthConn, error) {
 
 // NewProductConn returns a grpc client connection for ProductRepository
 func NewProductConn(config *conf.Config) (*ProductConn, error) {
+	log.Info("connecting to grpc product service...")
 	conn, err := newGRPCConn(config.RPCEndpoints.ProductServerURL)
 	if err != nil {
 		return nil, err
@@ -57,7 +60,7 @@ func newGRPCConn(serverURL string) (*grpc.ClientConn, error) {
 		grpc.WithInsecure(),
 		grpc.WithStreamInterceptor(grpc_retry.StreamClientInterceptor(retryOpts...)),
 		grpc.WithUnaryInterceptor(grpc_retry.UnaryClientInterceptor(retryOpts...)),
-		grpc.WithBlock(),
+		//grpc.WithBlock(),
 	)
 	if err != nil {
 		return nil, err

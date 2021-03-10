@@ -21,13 +21,13 @@ func JSONLogMiddleware() gin.HandlerFunc {
 		duration := GetDurationInMillseconds(start)
 
 		entry := log.WithFields(log.Fields{
-			"type":      "router",
-			"client_ip": GetClientIP(c),
-			"duration":  duration,
-			"method":    c.Request.Method,
-			"path":      c.Request.RequestURI,
-			"status":    c.Writer.Status(),
-			"referrer":  c.Request.Referer(),
+			"type":         "router",
+			"client_ip":    GetClientIP(c),
+			"duration(ms)": duration,
+			"method":       c.Request.Method,
+			"path":         c.Request.RequestURI,
+			"status":       c.Writer.Status(),
+			"referrer":     c.Request.Referer(),
 		})
 
 		if c.Writer.Status() >= 500 {

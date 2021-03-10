@@ -13,6 +13,8 @@ import (
 
 	"contrib.go.opencensus.io/exporter/ocagent"
 	"github.com/minghsu0107/saga-purchase/dep"
+	"github.com/minghsu0107/saga-purchase/infra/broker"
+	infrahttp "github.com/minghsu0107/saga-purchase/infra/http"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opencensus.io/trace"
 )
@@ -48,6 +50,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer broker.Publisher.Close()
+	defer broker.Subscriber.Close()
 	go func() {
 		err := server.Run()
 		if err != nil {
@@ -62,17 +66,20 @@ func main() {
 		// kill -2 is syscall.SIGINT
 		// kill -9 is syscall.SIGKILL but can't be catch, so don't need add it
 		signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
-		s := <-sig
+		<-sig
 
 		// graceful shutdown
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
-		if err := server.Svr.Shutdown(ctx); err != nil {
-			errs <- fmt.Errorf("error server shutdown: %v", err)
-		} else {
-			errs <- fmt.Errorf("caught signal: %v, gracefully shutdowned", s)
-		}
+		errs <- gracefulShutdown(ctx, server)
 	}()
 
 	log.Fatal(<-errs)
+}
+
+func gracefulShutdown(ctx context.Context, server *infrahttp.Server) error {
+	if err := server.Svr.Shutdown(ctx); err != nil {
+		return fmt.Errorf("error server shutdown: %v", err)
+	}
+	return fmt.Errorf("gracefully shutdowned")
 }

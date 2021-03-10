@@ -31,7 +31,7 @@ func (m *JWTAuthChecker) JWTAuth() gin.HandlerFunc {
 		authResult, err := m.repo.Auth(accessToken)
 		if err != nil {
 			m.logger.Error(err)
-			c.Abort()
+			c.AbortWithStatus(http.StatusServiceUnavailable)
 			return
 		}
 		if !authResult.Active || authResult.Expired {

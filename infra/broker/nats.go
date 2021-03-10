@@ -8,12 +8,19 @@ import (
 	stan "github.com/nats-io/stan.go"
 )
 
+// Publisher singleton
+var Publisher message.Publisher
+
+// Subscriber singleton
+var Subscriber message.Subscriber
+
 // NewNATSPublisher returns a NATS publisher for event streaming
 func NewNATSPublisher(config *conf.Config) (message.Publisher, error) {
-	publisher, err := nats.NewStreamingPublisher(
+	var err error
+	Publisher, err = nats.NewStreamingPublisher(
 		nats.StreamingPublisherConfig{
 			ClusterID: config.NATS.ClusterID,
-			ClientID:  config.NATS.ClientID,
+			ClientID:  config.NATS.ClientID + "_publisher",
 			StanOptions: []stan.Option{
 				stan.NatsURL(config.NATS.URL),
 			},
@@ -25,15 +32,16 @@ func NewNATSPublisher(config *conf.Config) (message.Publisher, error) {
 		return nil, err
 	}
 
-	return publisher, nil
+	return Publisher, nil
 }
 
 // NewNATSSubscriber returns a NATS subscriber for event streaming
 func NewNATSSubscriber(config *conf.Config) (message.Subscriber, error) {
-	subscriber, err := nats.NewStreamingSubscriber(
+	var err error
+	Subscriber, err = nats.NewStreamingSubscriber(
 		nats.StreamingSubscriberConfig{
 			ClusterID: config.NATS.ClusterID,
-			ClientID:  config.NATS.ClientID,
+			ClientID:  config.NATS.ClientID + "_subscriber",
 
 			QueueGroup:       config.NATS.QueueGroup,
 			DurableName:      config.NATS.DurableName,
@@ -49,5 +57,5 @@ func NewNATSSubscriber(config *conf.Config) (message.Subscriber, error) {
 		return nil, err
 	}
 
-	return subscriber, nil
+	return Subscriber, nil
 }

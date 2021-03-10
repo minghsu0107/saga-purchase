@@ -73,11 +73,12 @@ func (s *Server) RegisterRoutes() {
 // Run is a method for starting server
 func (s *Server) Run() error {
 	s.RegisterRoutes()
-
+	addr := ":" + s.Config.Port
 	s.Svr = &http.Server{
-		Addr:    ":" + s.Config.Port,
+		Addr:    addr,
 		Handler: s.Engine,
 	}
+	log.Infoln("listening on ", addr)
 	err := s.Svr.ListenAndServe()
 	if err != nil && err != http.ErrServerClosed {
 		return err
