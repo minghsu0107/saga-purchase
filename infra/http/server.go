@@ -36,7 +36,7 @@ func NewEngine(config *conf.Config) *gin.Engine {
 
 	engine := gin.New()
 	engine.Use(gin.Recovery())
-	engine.Use(middleware.JSONLogMiddleware())
+	engine.Use(middleware.LogMiddleware())
 	engine.Use(middleware.CORSMiddleware())
 	return engine
 }

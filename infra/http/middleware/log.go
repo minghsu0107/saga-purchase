@@ -8,8 +8,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// JSONLogMiddleware is the json logging middleware
-func JSONLogMiddleware() gin.HandlerFunc {
+// LogMiddleware is the logging middleware
+func LogMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Start timer
 		start := time.Now()
