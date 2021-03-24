@@ -10,6 +10,9 @@ import (
 	conf "github.com/minghsu0107/saga-purchase/config"
 	"github.com/minghsu0107/saga-purchase/infra/http/middleware"
 	log "github.com/sirupsen/logrus"
+	metrics "github.com/slok/go-http-metrics/metrics/prometheus"
+	prommiddleware "github.com/slok/go-http-metrics/middleware"
+	ginmiddleware "github.com/slok/go-http-metrics/middleware/gin"
 )
 
 // Server is the http wrapper
@@ -38,6 +41,11 @@ func NewEngine(config *conf.Config) *gin.Engine {
 	engine.Use(gin.Recovery())
 	engine.Use(middleware.LogMiddleware())
 	engine.Use(middleware.CORSMiddleware())
+
+	mdlw := prommiddleware.New(prommiddleware.Config{
+		Recorder: metrics.NewRecorder(metrics.Config{}),
+	})
+	engine.Use(ginmiddleware.Handler("", mdlw))
 	return engine
 }
 
