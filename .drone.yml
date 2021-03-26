@@ -31,8 +31,8 @@ steps:
   <<: *x-build-docker-image
   settings:
     repo: minghsu0107/saga-purchase
-    dockerfile: src/Dockerfile
-    context: src
+    dockerfile: Dockerfile
+    context: .
   depends_on:
     - test
   when:
