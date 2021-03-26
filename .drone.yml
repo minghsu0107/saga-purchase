@@ -25,7 +25,6 @@ steps:
   pull: if-not-exists
   image: golang:1.15.2
   commands:
-  - cd src
   - go mod download
   - make test
 - name: push-registry
