@@ -17,7 +17,7 @@ import (
 
 // Server is the http wrapper
 type Server struct {
-	Config         *conf.Config
+	Port           string
 	Engine         *gin.Engine
 	Router         *Router
 	Svr            *http.Server
@@ -54,7 +54,7 @@ func NewEngine(config *conf.Config) *gin.Engine {
 // NewServer is the factory for server instance
 func NewServer(config *conf.Config, engine *gin.Engine, router *Router, sseRouter *watermillHTTP.SSERouter, jwtAuthChecker *middleware.JWTAuthChecker) *Server {
 	return &Server{
-		Config:         config,
+		Port:           config.Port,
 		Engine:         engine,
 		Router:         router,
 		sseRouter:      sseRouter,
@@ -83,7 +83,7 @@ func (s *Server) RegisterRoutes() {
 // Run is a method for starting server
 func (s *Server) Run() error {
 	s.RegisterRoutes()
-	addr := ":" + s.Config.Port
+	addr := ":" + s.Port
 	s.Svr = &http.Server{
 		Addr:    addr,
 		Handler: s.Engine,
