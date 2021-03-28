@@ -14,7 +14,6 @@ require (
 	github.com/go-kit/kit v0.10.0
 	github.com/golang/mock v1.4.4
 	github.com/golang/protobuf v1.4.3
-	github.com/google/subcommands v1.2.0 // indirect
 	github.com/google/wire v0.4.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.0.1-0.20190118093823-f849b5445de4
 	github.com/kelseyhightower/envconfig v1.4.0
@@ -29,12 +28,10 @@ require (
 	github.com/sony/gobreaker v0.4.1
 	github.com/ugorji/go v1.1.14 // indirect
 	go.opencensus.io v0.23.0
-	golang.org/x/mod v0.4.2 // indirect
 	golang.org/x/net v0.0.0-20210226172049-e18ecbb05110 // indirect
 	golang.org/x/sys v0.0.0-20210326220804-49726bf1d181 // indirect
 	golang.org/x/text v0.3.5 // indirect
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
-	golang.org/x/tools v0.1.0 // indirect
 	google.golang.org/genproto v0.0.0-20210303154014-9728d6b83eeb // indirect
 	google.golang.org/grpc v1.36.0
 	gopkg.in/yaml.v2 v2.3.0
