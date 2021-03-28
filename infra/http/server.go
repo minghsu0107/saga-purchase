@@ -43,7 +43,9 @@ func NewEngine(config *conf.Config) *gin.Engine {
 	engine.Use(middleware.CORSMiddleware())
 
 	mdlw := prommiddleware.New(prommiddleware.Config{
-		Recorder: metrics.NewRecorder(metrics.Config{}),
+		Recorder: metrics.NewRecorder(metrics.Config{
+			Prefix: config.AppName,
+		}),
 	})
 	engine.Use(ginmiddleware.Handler("", mdlw))
 	return engine
