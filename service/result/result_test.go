@@ -17,7 +17,7 @@ var purchaseResultSvc PurchaseResultService
 
 func TestRouter(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "result service suite")
+	RunSpecs(t, "purchase result service suite")
 }
 
 var _ = BeforeSuite(func() {
