@@ -1,6 +1,7 @@
 package http
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"time"
@@ -51,9 +52,7 @@ func (h *PurchaseResultStreamHandler) Validate(r *http.Request, msg *message.Mes
 	}
 	customerID := r.Context().Value(config.CustomerKey).(uint64)
 	if customerID == purchaseResult.CustomerId {
-		if err = h.PurchaseResultSvc.SetPurchaseResult(purchaseResult); err != nil {
-			return
-		}
+		r = r.WithContext(context.WithValue(r.Context(), config.MsgKey, h.PurchaseResultSvc.MapPurchaseResult(purchaseResult)))
 		ok = true
 	}
 	return
@@ -61,8 +60,7 @@ func (h *PurchaseResultStreamHandler) Validate(r *http.Request, msg *message.Mes
 
 // GetResponse is the http handler that generates SSE responses
 func (h *PurchaseResultStreamHandler) GetResponse(w http.ResponseWriter, r *http.Request) (response interface{}, ok bool) {
-	customerID := r.Context().Value(config.CustomerKey).(uint64)
-	purchaseResult, err := h.PurchaseResultSvc.GetPurchaseResult(customerID)
+	purchaseResult, err := h.PurchaseResultSvc.GetPurchaseResult(r)
 	if err != nil {
 		return nil, false
 	}

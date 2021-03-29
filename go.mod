@@ -7,8 +7,6 @@ require (
 	github.com/ThreeDotsLabs/watermill v1.1.1
 	github.com/ThreeDotsLabs/watermill-http v1.1.3
 	github.com/ThreeDotsLabs/watermill-nats v1.0.5
-	github.com/allegro/bigcache/v2 v2.2.5 // indirect
-	github.com/allegro/bigcache/v3 v3.0.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-kit/kit v0.10.0

@@ -1,54 +1,48 @@
 package result
 
 import (
+	"fmt"
+	"net/http"
+
 	pb "github.com/minghsu0107/saga-pb"
 	conf "github.com/minghsu0107/saga-purchase/config"
 	"github.com/minghsu0107/saga-purchase/domain/event"
-	"github.com/minghsu0107/saga-purchase/repo"
 	log "github.com/sirupsen/logrus"
 )
 
 // PurchaseResultServiceImpl implements PurchaseResultService interface
 type PurchaseResultServiceImpl struct {
 	logger *log.Entry
-	repo   repo.PurchaseResultRepository
 }
 
 // NewPurchaseResultService is the factory of PurchaseResultServiceImpl
-func NewPurchaseResultService(config *conf.Config, repo repo.PurchaseResultRepository) PurchaseResultService {
+func NewPurchaseResultService(config *conf.Config) PurchaseResultService {
 	return &PurchaseResultServiceImpl{
-		repo: repo,
 		logger: config.Logger.ContextLogger.WithFields(log.Fields{
 			"type": "service:PurchaseResultService",
 		}),
 	}
 }
 
-// SetPurchaseResult save purchase result to local cache
-func (svc *PurchaseResultServiceImpl) SetPurchaseResult(purchaseResult *pb.PurchaseResult) error {
+// MapPurchaseResult maps protobuf purchase result to a purchase result domain entity
+func (svc *PurchaseResultServiceImpl) MapPurchaseResult(purchaseResult *pb.PurchaseResult) *event.PurchaseResult {
 	step := getPurchaseStep(purchaseResult.Step)
 	status := getPurchaseStatus(purchaseResult.Status)
 	svc.logger.WithFields(log.Fields{
 		"step":   step,
 		"status": status,
 	}).Info("new purchase result")
-	err := svc.repo.SetPurchaseResult(purchaseResult.CustomerId, &event.PurchaseResult{
+	return &event.PurchaseResult{
 		Step:   step,
 		Status: status,
-	})
-	if err != nil {
-		svc.logger.Error(err)
-		return err
 	}
-	return nil
 }
 
-// GetPurchaseResult retrives a purchase result by customer ID
-func (svc *PurchaseResultServiceImpl) GetPurchaseResult(customerID uint64) (*event.PurchaseResult, error) {
-	purchaseResult, err := svc.repo.GetPurchaseResult(customerID)
-	if err != nil {
-		svc.logger.Error(err)
-		return nil, err
+// GetPurchaseResult retrieves purchase result from http request context
+func (svc *PurchaseResultServiceImpl) GetPurchaseResult(req *http.Request) (*event.PurchaseResult, error) {
+	purchaseResult, ok := req.Context().Value(conf.MsgKey).(*event.PurchaseResult)
+	if !ok {
+		return nil, fmt.Errorf("error when casting purchase result")
 	}
 	return purchaseResult, nil
 }

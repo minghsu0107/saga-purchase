@@ -8,7 +8,6 @@ package dep
 import (
 	"github.com/minghsu0107/saga-purchase/config"
 	"github.com/minghsu0107/saga-purchase/infra/broker"
-	"github.com/minghsu0107/saga-purchase/infra/cache"
 	"github.com/minghsu0107/saga-purchase/infra/grpc"
 	"github.com/minghsu0107/saga-purchase/infra/http"
 	"github.com/minghsu0107/saga-purchase/infra/http/middleware"
@@ -25,15 +24,7 @@ func InitializeServer() (*http.Server, error) {
 		return nil, err
 	}
 	engine := http.NewEngine(configConfig)
-	bigCache, err := cache.NewLocalCache()
-	if err != nil {
-		return nil, err
-	}
-	purchaseResultRepository, err := repo.NewPurchaseResultRepository(bigCache)
-	if err != nil {
-		return nil, err
-	}
-	purchaseResultService := result.NewPurchaseResultService(configConfig, purchaseResultRepository)
+	purchaseResultService := result.NewPurchaseResultService(configConfig)
 	purchaseResultStreamHandler := http.NewPurchaseResultStreamHandler(purchaseResultService)
 	publisher, err := broker.NewNATSPublisher(configConfig)
 	if err != nil {

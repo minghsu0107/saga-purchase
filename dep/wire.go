@@ -7,7 +7,6 @@ import (
 	"github.com/google/wire"
 	conf "github.com/minghsu0107/saga-purchase/config"
 	"github.com/minghsu0107/saga-purchase/infra/broker"
-	"github.com/minghsu0107/saga-purchase/infra/cache"
 	"github.com/minghsu0107/saga-purchase/infra/grpc"
 	"github.com/minghsu0107/saga-purchase/infra/http"
 	"github.com/minghsu0107/saga-purchase/infra/http/middleware"
@@ -31,8 +30,6 @@ func InitializeServer() (*http.Server, error) {
 		grpc.NewAuthConn,
 		grpc.NewProductConn,
 
-		cache.NewLocalCache,
-
 		broker.NewSSERouter,
 		broker.NewNATSSubscriber,
 		broker.NewNATSPublisher,
@@ -41,7 +38,6 @@ func InitializeServer() (*http.Server, error) {
 		purchase.NewPurchasingService,
 
 		repo.NewAuthRepository,
-		repo.NewPurchaseResultRepository,
 		repo.NewPurchasingRepository,
 		repo.NewProductRepository,
 	)

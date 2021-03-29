@@ -18,12 +18,12 @@ import (
 	"github.com/minghsu0107/saga-purchase/infra/http/presenter"
 	mock_repo "github.com/minghsu0107/saga-purchase/mock/repo"
 
-	"github.com/minghsu0107/saga-purchase/infra/broker"
-
 	"github.com/golang/mock/gomock"
+	pb "github.com/minghsu0107/saga-pb"
 	conf "github.com/minghsu0107/saga-purchase/config"
 	"github.com/minghsu0107/saga-purchase/domain/event"
 	"github.com/minghsu0107/saga-purchase/domain/model"
+	"github.com/minghsu0107/saga-purchase/infra/broker"
 	mock_service "github.com/minghsu0107/saga-purchase/mock/service"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -34,9 +34,11 @@ var (
 	mockCtrl              *gomock.Controller
 	mockSubscriber        *MockSubscriber
 	mockAuthRepo          *mock_repo.MockAuthRepository
-	mockPurchaseResultSvc *mock_service.MockPurchaseResultService
+	mockPurchaseResultSvc MockPurchaseResultSvc
 	mockPurchasingSvc     *mock_service.MockPurchasingService
 	server                *Server
+
+	dummyPurchaseResult *event.PurchaseResult
 )
 
 func TestRouter(t *testing.T) {
@@ -46,6 +48,22 @@ func TestRouter(t *testing.T) {
 }
 
 type MockSubscriber struct{}
+
+type MockPurchaseResultSvc struct {
+	PurchaseResult *event.PurchaseResult
+}
+
+func (m MockPurchaseResultSvc) MapPurchaseResult(purchaseResult *pb.PurchaseResult) *event.PurchaseResult {
+	return nil
+}
+func (m MockPurchaseResultSvc) GetPurchaseResult(req *http.Request) (*event.PurchaseResult, error) {
+	return m.PurchaseResult, nil
+}
+
+type CustomClaims struct {
+	CustomerID uint64
+	jwt.StandardClaims
+}
 
 func (ms *MockSubscriber) Subscribe(ctx context.Context, topic string) (<-chan *message.Message, error) {
 	outputChannel := make(chan *message.Message)
@@ -59,7 +77,13 @@ func (ms *MockSubscriber) Close() error {
 func InitMocks() {
 	mockAuthRepo = mock_repo.NewMockAuthRepository(mockCtrl)
 
-	mockPurchaseResultSvc = mock_service.NewMockPurchaseResultService(mockCtrl)
+	dummyPurchaseResult = &event.PurchaseResult{
+		Step:   "dummpstep",
+		Status: "dummystatus",
+	}
+	mockPurchaseResultSvc = MockPurchaseResultSvc{
+		PurchaseResult: dummyPurchaseResult,
+	}
 	mockPurchasingSvc = mock_service.NewMockPurchasingService(mockCtrl)
 }
 
@@ -101,9 +125,10 @@ func GetResponseWithBearerToken(router *gin.Engine, method, token, url string, b
 	return w
 }
 
-type CustomClaims struct {
-	CustomerID uint64
-	jwt.StandardClaims
+func GetJSON(w *httptest.ResponseRecorder, target interface{}) error {
+	body := ioutil.NopCloser(w.Body)
+	defer body.Close()
+	return json.NewDecoder(w.Body).Decode(target)
 }
 
 var _ = BeforeSuite(func() {
@@ -127,7 +152,7 @@ var _ = Describe("router", func() {
 			w := GetResponse(server.Engine, "POST", purchasingEndpoint, nil)
 			Expect(w.Code).To(Equal(401))
 		})
-		It("should eturn 401 unauthorized when trying to retreive purchase result", func() {
+		It("should return 401 unauthorized when trying to retreive purchase result", func() {
 			w := GetResponse(server.Engine, "GET", purchaseResultEndpoint, nil)
 			Expect(w.Code).To(Equal(401))
 		})
@@ -156,7 +181,7 @@ var _ = Describe("router", func() {
 			BeforeEach(func() {
 				testPurchase = presenter.Purchase{
 					CartItems: &[]presenter.CartItem{
-						presenter.CartItem{
+						{
 							ProductID: 1,
 							Amount:    3,
 						},
@@ -218,11 +243,11 @@ var _ = Describe("router", func() {
 					Expired:    false,
 				}, nil)
 
-				mockPurchaseResultSvc.EXPECT().
-					GetPurchaseResult(customerID).Return(&event.PurchaseResult{}, nil)
-
 				w := GetResponseWithBearerToken(server.Engine, "GET", tokenString, purchaseResultEndpoint, nil)
 				Expect(w.Code).To(Equal(200))
+				receivedPurchaseResult := &event.PurchaseResult{}
+				GetJSON(w, receivedPurchaseResult)
+				Expect(receivedPurchaseResult).To(Equal(dummyPurchaseResult))
 			})
 			It("should fail if using wrong method", func() {
 				w := GetResponseWithBearerToken(server.Engine, "POST", tokenString, purchaseResultEndpoint, nil)
