@@ -1,4 +1,3 @@
 #!/bin/bash
-make dep
-make pretest
 go mod tidy
+make dep
