@@ -44,4 +44,10 @@ var _ = Describe("result service", func() {
 		Expect(err).To(BeNil())
 		Expect(curPurchaseResult).To(Equal(purchaseResult))
 	})
+	It("should return nil if not receiving new purchase results", func() {
+		r := &http.Request{}
+		curPurchaseResult, err := purchaseResultSvc.GetPurchaseResult(r)
+		Expect(err).To(BeNil())
+		Expect(curPurchaseResult).To(BeNil())
+	})
 })

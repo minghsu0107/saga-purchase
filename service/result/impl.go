@@ -40,7 +40,11 @@ func (svc *PurchaseResultServiceImpl) MapPurchaseResult(purchaseResult *pb.Purch
 
 // GetPurchaseResult retrieves purchase result from http request context
 func (svc *PurchaseResultServiceImpl) GetPurchaseResult(req *http.Request) (*event.PurchaseResult, error) {
-	purchaseResult, ok := req.Context().Value(conf.MsgKey).(*event.PurchaseResult)
+	val := req.Context().Value(conf.MsgKey)
+	if val == nil {
+		return nil, nil
+	}
+	purchaseResult, ok := val.(*event.PurchaseResult)
 	if !ok {
 		return nil, fmt.Errorf("error when casting purchase result")
 	}
