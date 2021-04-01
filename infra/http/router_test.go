@@ -38,7 +38,8 @@ var (
 	mockPurchasingSvc     *mock_service.MockPurchasingService
 	server                *Server
 
-	dummyPurchaseResult *event.PurchaseResult
+	dummyPurchaseResult      *event.PurchaseResult
+	isDummyPurchaseResultNil bool
 )
 
 func TestRouter(t *testing.T) {
@@ -57,6 +58,9 @@ func (m MockPurchaseResultSvc) MapPurchaseResult(purchaseResult *pb.PurchaseResu
 	return nil
 }
 func (m MockPurchaseResultSvc) GetPurchaseResult(req *http.Request) (*event.PurchaseResult, error) {
+	if isDummyPurchaseResultNil {
+		return nil, nil
+	}
 	return m.PurchaseResult, nil
 }
 
@@ -242,12 +246,28 @@ var _ = Describe("router", func() {
 					Active:     true,
 					Expired:    false,
 				}, nil)
+				isDummyPurchaseResultNil = false
 
 				w := GetResponseWithBearerToken(server.Engine, "GET", tokenString, purchaseResultEndpoint, nil)
 				Expect(w.Code).To(Equal(200))
 				receivedPurchaseResult := &event.PurchaseResult{}
 				GetJSON(w, receivedPurchaseResult)
 				Expect(receivedPurchaseResult).To(Equal(dummyPurchaseResult))
+			})
+			It("should receive empty object if there is no purchase result", func() {
+				mockAuthRepo.EXPECT().
+					Auth(tokenString).Return(&model.AuthResult{
+					CustomerID: customerID,
+					Active:     true,
+					Expired:    false,
+				}, nil)
+				isDummyPurchaseResultNil = true
+
+				w := GetResponseWithBearerToken(server.Engine, "GET", tokenString, purchaseResultEndpoint, nil)
+				Expect(w.Code).To(Equal(200))
+				receivedPurchaseResult := &event.PurchaseResult{}
+				GetJSON(w, receivedPurchaseResult)
+				Expect(receivedPurchaseResult).To(Equal(&event.PurchaseResult{}))
 			})
 			It("should fail if using wrong method", func() {
 				w := GetResponseWithBearerToken(server.Engine, "POST", tokenString, purchaseResultEndpoint, nil)

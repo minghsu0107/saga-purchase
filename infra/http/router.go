@@ -64,6 +64,9 @@ func (h *PurchaseResultStreamHandler) GetResponse(w http.ResponseWriter, r *http
 	if err != nil {
 		return nil, false
 	}
+	if purchaseResult == nil {
+		return nil, true
+	}
 	return &presenter.PurchaseResult{
 		Step:      purchaseResult.Step,
 		Status:    purchaseResult.Status,
