@@ -45,7 +45,7 @@ func NewPurchaseResultStreamHandler(purchaseResultSvc result.PurchaseResultServi
 // Validate determine whether we should process the incoming message for the current http request
 func (h *PurchaseResultStreamHandler) Validate(r *http.Request, msg *message.Message) (ok bool) {
 	ok = false
-	var purchaseResult *pb.PurchaseResult
+	purchaseResult := &pb.PurchaseResult{}
 	err := json.Unmarshal(msg.Payload, purchaseResult)
 	if err != nil {
 		return
