@@ -31,8 +31,8 @@ type NATS struct {
 
 // RPCEndpoints wraps all rpc server urls
 type RPCEndpoints struct {
-	AuthServerURL    string `yaml:"authServerURL"`
-	ProductServerURL string `yaml:"productServerURL"`
+	AuthSvcHost    string `yaml:"authSvcHost" envconfig:"RPC_AUTH_SVC_HOST"`
+	ProductSvcHost string `yaml:"productSvcHost" envconfig:"RPC_PRODUCT_SVC_HOST"`
 }
 
 // ServiceOptions defines options for rpc calls between services

@@ -24,7 +24,7 @@ type ProductConn struct {
 // NewAuthConn returns a grpc client connection for AuthRepository
 func NewAuthConn(config *conf.Config) (*AuthConn, error) {
 	log.Info("connecting to grpc auth service...")
-	conn, err := newGRPCConn(config.RPCEndpoints.AuthServerURL)
+	conn, err := newGRPCConn(config.RPCEndpoints.AuthSvcHost)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +36,7 @@ func NewAuthConn(config *conf.Config) (*AuthConn, error) {
 // NewProductConn returns a grpc client connection for ProductRepository
 func NewProductConn(config *conf.Config) (*ProductConn, error) {
 	log.Info("connecting to grpc product service...")
-	conn, err := newGRPCConn(config.RPCEndpoints.ProductServerURL)
+	conn, err := newGRPCConn(config.RPCEndpoints.ProductSvcHost)
 	if err != nil {
 		return nil, err
 	}

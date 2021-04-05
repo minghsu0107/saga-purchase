@@ -9,8 +9,8 @@ nats:
   durableName: "purchase-svc-durable"
   subscriberCount: 1
 rpcEndpoints:
-  authServerURL: ""
-  productServerURL: ""
+  authSvcHost: ""
+  productSvcHost: ""
 serviceOptions:
   rps: 100
   timeoutSecond: 10
