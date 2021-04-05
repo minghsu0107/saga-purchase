@@ -20,7 +20,7 @@ type Server struct {
 	Port           string
 	Engine         *gin.Engine
 	Router         *Router
-	Svr            *http.Server
+	svr            *http.Server
 	sseRouter      *watermillHTTP.SSERouter
 	jwtAuthChecker *middleware.JWTAuthChecker
 }
@@ -84,14 +84,19 @@ func (s *Server) RegisterRoutes() {
 func (s *Server) Run() error {
 	s.RegisterRoutes()
 	addr := ":" + s.Port
-	s.Svr = &http.Server{
+	s.svr = &http.Server{
 		Addr:    addr,
 		Handler: s.Engine,
 	}
 	log.Infoln("listening on ", addr)
-	err := s.Svr.ListenAndServe()
+	err := s.svr.ListenAndServe()
 	if err != nil && err != http.ErrServerClosed {
 		return err
 	}
 	return nil
+}
+
+// GracefulStop the server
+func (s *Server) GracefulStop(ctx context.Context) error {
+	return s.svr.Shutdown(ctx)
 }

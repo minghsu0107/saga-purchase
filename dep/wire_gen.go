@@ -7,6 +7,7 @@ package dep
 
 import (
 	"github.com/minghsu0107/saga-purchase/config"
+	"github.com/minghsu0107/saga-purchase/infra"
 	"github.com/minghsu0107/saga-purchase/infra/broker"
 	"github.com/minghsu0107/saga-purchase/infra/grpc"
 	"github.com/minghsu0107/saga-purchase/infra/http"
@@ -18,7 +19,7 @@ import (
 
 // Injectors from wire.go:
 
-func InitializeServer() (*http.Server, error) {
+func InitializeServer() (*infra.Server, error) {
 	configConfig, err := config.NewConfig()
 	if err != nil {
 		return nil, err
@@ -54,5 +55,6 @@ func InitializeServer() (*http.Server, error) {
 	authRepository := repo.NewAuthRepository(authConn, configConfig)
 	jwtAuthChecker := middleware.NewJWTAuthChecker(configConfig, authRepository)
 	server := http.NewServer(configConfig, engine, router, sseRouter, jwtAuthChecker)
-	return server, nil
+	infraServer := infra.NewServer(server)
+	return infraServer, nil
 }

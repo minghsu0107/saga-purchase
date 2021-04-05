@@ -6,6 +6,7 @@ package dep
 import (
 	"github.com/google/wire"
 	conf "github.com/minghsu0107/saga-purchase/config"
+	"github.com/minghsu0107/saga-purchase/infra"
 	"github.com/minghsu0107/saga-purchase/infra/broker"
 	"github.com/minghsu0107/saga-purchase/infra/grpc"
 	"github.com/minghsu0107/saga-purchase/infra/http"
@@ -15,9 +16,11 @@ import (
 	"github.com/minghsu0107/saga-purchase/service/result"
 )
 
-func InitializeServer() (*http.Server, error) {
+func InitializeServer() (*infra.Server, error) {
 	wire.Build(
 		conf.NewConfig,
+
+		infra.NewServer,
 
 		http.NewServer,
 		http.NewEngine,
@@ -41,5 +44,5 @@ func InitializeServer() (*http.Server, error) {
 		repo.NewPurchasingRepository,
 		repo.NewProductRepository,
 	)
-	return &http.Server{}, nil
+	return &infra.Server{}, nil
 }

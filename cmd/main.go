@@ -14,7 +14,6 @@ import (
 	"contrib.go.opencensus.io/exporter/ocagent"
 	"github.com/minghsu0107/saga-purchase/dep"
 	"github.com/minghsu0107/saga-purchase/infra/broker"
-	infrahttp "github.com/minghsu0107/saga-purchase/infra/http"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opencensus.io/trace"
 )
@@ -68,18 +67,10 @@ func main() {
 		// graceful shutdown
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
-		errs <- gracefulShutdown(ctx, server)
+		errs <- server.GracefulStop(ctx)
 	}()
 	err = <-errs
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-func gracefulShutdown(ctx context.Context, server *infrahttp.Server) error {
-	if err := server.Svr.Shutdown(ctx); err != nil {
-		return fmt.Errorf("error server shutdown: %v", err)
-	}
-	log.Info("gracefully shutdowned")
-	return nil
 }
