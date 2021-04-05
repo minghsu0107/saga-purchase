@@ -56,8 +56,8 @@ func NewAuthRepository(conn *grpc.AuthConn, config *conf.Config) AuthRepository 
 }
 
 // Auth method implements AuthRepository interface
-func (svc *AuthRepositoryImpl) Auth(accessToken string) (*model.AuthResult, error) {
-	res, err := svc.auth(svc.ctx, &pb.AuthPayload{
+func (repo *AuthRepositoryImpl) Auth(accessToken string) (*model.AuthResult, error) {
+	res, err := repo.auth(repo.ctx, &pb.AuthPayload{
 		AccessToken: accessToken,
 	})
 	if err != nil {
