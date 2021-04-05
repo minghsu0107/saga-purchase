@@ -2,7 +2,6 @@ package infra
 
 import (
 	"context"
-	"fmt"
 
 	infra_http "github.com/minghsu0107/saga-purchase/infra/http"
 	log "github.com/sirupsen/logrus"
@@ -28,10 +27,15 @@ func (s *Server) Run() error {
 }
 
 // GracefulStop server
-func (s *Server) GracefulStop(ctx context.Context) error {
-	if err := s.HTTPServer.GracefulStop(ctx); err != nil {
-		return fmt.Errorf("error server shutdown: %v", err)
+func (s *Server) GracefulStop(ctx context.Context, done chan bool) {
+	errs := make(chan error, 1)
+	go func() {
+		errs <- s.HTTPServer.GracefulStop(ctx)
+	}()
+	err := <-errs
+	if err != nil {
+		log.Error(err)
 	}
 	log.Info("gracefully shutdowned")
-	return nil
+	done <- true
 }
