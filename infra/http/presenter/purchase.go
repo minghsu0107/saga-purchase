@@ -20,6 +20,6 @@ type Payment struct {
 
 // Purchase is the HTTP JSON request of creating new purchase
 type Purchase struct {
-	CartItems *[]CartItem `json:"purchase_items"`
+	CartItems *[]CartItem `json:"purchase_items" binding:"min=1"`
 	Payment   *Payment    `json:"payment"`
 }
