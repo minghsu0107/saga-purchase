@@ -2,13 +2,20 @@ package middleware
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 	conf "github.com/minghsu0107/saga-purchase/config"
+	"github.com/minghsu0107/saga-purchase/infra/http/presenter"
 	"github.com/minghsu0107/saga-purchase/repo"
 	log "github.com/sirupsen/logrus"
+)
+
+var (
+	// ErrTokenExpired is token expired error
+	ErrTokenExpired = errors.New("token expired")
 )
 
 func extractToken(r *http.Request) string {
@@ -31,11 +38,13 @@ func (m *JWTAuthChecker) JWTAuth() gin.HandlerFunc {
 		authResult, err := m.repo.Auth(accessToken)
 		if err != nil {
 			m.logger.Error(err)
-			c.AbortWithStatus(http.StatusServiceUnavailable)
+			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
-		if !authResult.Active || authResult.Expired {
-			c.AbortWithStatus(http.StatusUnauthorized)
+		if authResult.Expired {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, presenter.ErrResponse{
+				Message: ErrTokenExpired.Error(),
+			})
 			return
 		}
 		c.Request = c.Request.WithContext(context.WithValue(c.Request.Context(), conf.CustomerKey, authResult.CustomerID))

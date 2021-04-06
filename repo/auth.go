@@ -66,7 +66,6 @@ func (repo *AuthRepositoryImpl) Auth(accessToken string) (*model.AuthResult, err
 	response := res.(*pb.AuthResponse)
 	return &model.AuthResult{
 		CustomerID: response.CustomerId,
-		Active:     response.Active,
 		Expired:    response.Expired,
 	}, nil
 }

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -202,7 +203,6 @@ var _ = Describe("router", func() {
 				mockAuthRepo.EXPECT().
 					Auth(tokenString).Return(&model.AuthResult{
 					CustomerID: customerID,
-					Active:     true,
 					Expired:    false,
 				}, nil)
 				mockPurchasingSvc.EXPECT().
@@ -220,20 +220,19 @@ var _ = Describe("router", func() {
 					mockAuthRepo.EXPECT().
 						Auth(tokenString).Return(&model.AuthResult{
 						CustomerID: customerID,
-						Active:     true,
 						Expired:    true,
 					}, nil)
 					w := GetResponseWithBearerToken(server.Engine, "POST", tokenString, purchasingEndpoint, body)
 					Expect(w.Code).To(Equal(401))
 				})
-				Context("when customer account is not active", func() {
+				Context("when access token is invalid", func() {
 					mockAuthRepo.EXPECT().
-						Auth(tokenString).Return(&model.AuthResult{
-						CustomerID: customerID,
-						Active:     false,
-						Expired:    false,
-					}, nil)
+						Auth(tokenString).Return(nil, errors.New("invalid token"))
 					w := GetResponseWithBearerToken(server.Engine, "POST", tokenString, purchasingEndpoint, body)
+					Expect(w.Code).To(Equal(401))
+				})
+				Context("when access token is empty", func() {
+					w := GetResponseWithBearerToken(server.Engine, "POST", "", purchasingEndpoint, body)
 					Expect(w.Code).To(Equal(401))
 				})
 			})
@@ -243,7 +242,6 @@ var _ = Describe("router", func() {
 				mockAuthRepo.EXPECT().
 					Auth(tokenString).Return(&model.AuthResult{
 					CustomerID: customerID,
-					Active:     true,
 					Expired:    false,
 				}, nil)
 				isDummyPurchaseResultNil = false
@@ -258,7 +256,6 @@ var _ = Describe("router", func() {
 				mockAuthRepo.EXPECT().
 					Auth(tokenString).Return(&model.AuthResult{
 					CustomerID: customerID,
-					Active:     true,
 					Expired:    false,
 				}, nil)
 				isDummyPurchaseResultNil = true
@@ -279,20 +276,19 @@ var _ = Describe("router", func() {
 					mockAuthRepo.EXPECT().
 						Auth(tokenString).Return(&model.AuthResult{
 						CustomerID: customerID,
-						Active:     true,
 						Expired:    true,
 					}, nil)
 					w := GetResponseWithBearerToken(server.Engine, "GET", tokenString, purchaseResultEndpoint, nil)
 					Expect(w.Code).To(Equal(401))
 				})
-				Context("when customer account is not active", func() {
+				Context("when access token is invalid", func() {
 					mockAuthRepo.EXPECT().
-						Auth(tokenString).Return(&model.AuthResult{
-						CustomerID: customerID,
-						Active:     false,
-						Expired:    false,
-					}, nil)
+						Auth(tokenString).Return(nil, errors.New("invalid token"))
 					w := GetResponseWithBearerToken(server.Engine, "GET", tokenString, purchaseResultEndpoint, nil)
+					Expect(w.Code).To(Equal(401))
+				})
+				Context("when access token is empty", func() {
+					w := GetResponseWithBearerToken(server.Engine, "GET", "", purchaseResultEndpoint, nil)
 					Expect(w.Code).To(Equal(401))
 				})
 			})

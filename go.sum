@@ -322,6 +322,8 @@ github.com/matttproud/golang_protobuf_extensions v1.0.1/go.mod h1:D8He9yQNgCq6Z5
 github.com/miekg/dns v1.0.14/go.mod h1:W1PPwlIAgtquWBMBEV9nkV9Cazfe8ScdGz/Lj7v3Nrg=
 github.com/minghsu0107/saga-pb v0.1.0 h1:+pydZBwWJiXMfTXMs5BnAza4lI7F4Em4n8MOfG44mbI=
 github.com/minghsu0107/saga-pb v0.1.0/go.mod h1:tVhLMJ7xRWSBH3sUl2ihheMRgVgfhqcE4Qr602ojho8=
+github.com/minghsu0107/saga-pb v0.2.0 h1:kuJ1Mdva7n/xq0nw3onz59Q5MJwJGdd5MN6w6jYF2r0=
+github.com/minghsu0107/saga-pb v0.2.0/go.mod h1:tVhLMJ7xRWSBH3sUl2ihheMRgVgfhqcE4Qr602ojho8=
 github.com/mitchellh/cli v1.0.0/go.mod h1:hNIlj7HEI86fIcpObd7a0FcrxTWetlwJDGcceTlRvqc=
 github.com/mitchellh/go-homedir v1.0.0/go.mod h1:SfyaCUpYCn1Vlf4IUYiD9fPX4A5wJrkLzIz1N1q0pr0=
 github.com/mitchellh/go-testing-interface v1.0.0/go.mod h1:kRemZodwjscx+RGhAo8eIhFbs2+BFgRtFPeD/KE+zxI=
