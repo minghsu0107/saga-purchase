@@ -14,6 +14,7 @@ import (
 	"contrib.go.opencensus.io/exporter/ocagent"
 	"github.com/minghsu0107/saga-purchase/dep"
 	"github.com/minghsu0107/saga-purchase/infra/broker"
+	"github.com/minghsu0107/saga-purchase/infra/grpc"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opencensus.io/trace"
 )
@@ -51,6 +52,9 @@ func main() {
 	}
 	defer broker.Publisher.Close()
 	defer broker.Subscriber.Close()
+	defer grpc.AuthClientConn.Conn.Close()
+	defer grpc.ProductClientConn.Conn.Close()
+
 	go func() {
 		errs <- server.Run()
 	}()

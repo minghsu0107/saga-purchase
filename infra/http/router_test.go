@@ -101,6 +101,7 @@ func NewTestServer() *Server {
 			}),
 		},
 	}
+	log.SetOutput(config.Logger.Writer)
 	engine := NewEngine(config)
 	purchaseResultStreamHandler := NewPurchaseResultStreamHandler(mockPurchaseResultSvc)
 	purchasingHandler := NewPurchasingHandler(mockPurchasingSvc)

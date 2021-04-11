@@ -4,6 +4,8 @@ import (
 	"os"
 	"time"
 
+	log "github.com/sirupsen/logrus"
+
 	"github.com/kelseyhightower/envconfig"
 	"gopkg.in/yaml.v2"
 )
@@ -13,6 +15,7 @@ type Config struct {
 	Port           string          `yaml:"port" envconfig:"PORT"`
 	AppName        string          `yaml:"appName" envconfig:"APP_NAME"`
 	GinMode        string          `yaml:"ginMode" envconfig:"GIN_MODE"`
+	Provider       string          `yaml:"provider" envconfig:"PROVIDER"`
 	NATS           *NATS           `yaml:"nats"`
 	RPCEndpoints   *RPCEndpoints   `yaml:"rpcEndpoints"`
 	ServiceOptions *ServiceOptions `yaml:"serviceOptions"`
@@ -52,6 +55,8 @@ func NewConfig() (*Config, error) {
 		return nil, err
 	}
 	config.Logger = newLogger(config.AppName)
+	log.SetOutput(config.Logger.Writer)
+
 	config.ServiceOptions.Timeout = time.Duration(config.ServiceOptions.TimeoutSecond) * time.Second
 	return &config, nil
 }

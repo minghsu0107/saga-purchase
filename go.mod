@@ -22,6 +22,7 @@ require (
 	github.com/onsi/ginkgo v1.7.0
 	github.com/onsi/gomega v1.4.3
 	github.com/prometheus/client_golang v1.9.0
+	github.com/sercand/kuberesolver/v3 v3.0.0
 	github.com/sirupsen/logrus v1.8.0
 	github.com/slok/go-http-metrics v0.9.0
 	github.com/sony/gobreaker v0.4.1
