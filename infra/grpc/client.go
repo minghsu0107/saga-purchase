@@ -57,7 +57,7 @@ func NewProductConn(config *conf.Config) (*ProductConn, error) {
 	return ProductClientConn, nil
 }
 
-func newGRPCConn(provider, serverURL string) (*grpc.ClientConn, error) {
+func newGRPCConn(provider, svcHost string) (*grpc.ClientConn, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
@@ -79,7 +79,7 @@ func newGRPCConn(provider, serverURL string) (*grpc.ClientConn, error) {
 
 	conn, err := grpc.DialContext(
 		ctx,
-		fmt.Sprintf("%s///%s", scheme, serverURL),
+		fmt.Sprintf("%s///%s", scheme, svcHost),
 		grpc.WithInsecure(),
 		grpc.WithBalancerName(roundrobin.Name),
 		grpc.WithStreamInterceptor(grpc_retry.StreamClientInterceptor(retryOpts...)),
