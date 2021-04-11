@@ -79,7 +79,7 @@ func newGRPCConn(provider, svcHost string) (*grpc.ClientConn, error) {
 
 	conn, err := grpc.DialContext(
 		ctx,
-		fmt.Sprintf("%s///%s", scheme, svcHost),
+		fmt.Sprintf("%s:///%s", scheme, svcHost),
 		grpc.WithInsecure(),
 		grpc.WithBalancerName(roundrobin.Name),
 		grpc.WithStreamInterceptor(grpc_retry.StreamClientInterceptor(retryOpts...)),
