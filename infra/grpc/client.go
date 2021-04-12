@@ -76,7 +76,7 @@ func newGRPCConn(provider, svcHost string) (*grpc.ClientConn, error) {
 	retryOpts := []grpc_retry.CallOption{
 		// generate waits between 900ms to 1100ms
 		grpc_retry.WithBackoff(grpc_retry.BackoffLinearWithJitter(1*time.Second, 0.1)),
-		grpc_retry.WithCodes(codes.Unavailable, codes.DeadlineExceeded, codes.Canceled),
+		grpc_retry.WithCodes(codes.NotFound, codes.Aborted),
 	}
 
 	conn, err := grpc.DialContext(

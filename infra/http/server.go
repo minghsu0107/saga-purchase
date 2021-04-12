@@ -53,7 +53,7 @@ func NewEngine(config *conf.Config) *gin.Engine {
 // NewServer is the factory for server instance
 func NewServer(config *conf.Config, engine *gin.Engine, router *Router, sseRouter *watermillHTTP.SSERouter, jwtAuthChecker *middleware.JWTAuthChecker) *Server {
 	return &Server{
-		Port:           config.Port,
+		Port:           config.HTTPPort,
 		Engine:         engine,
 		Router:         router,
 		sseRouter:      sseRouter,

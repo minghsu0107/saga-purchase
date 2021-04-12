@@ -12,7 +12,7 @@ import (
 
 // Config is a type for general configuration
 type Config struct {
-	Port           string          `yaml:"port" envconfig:"PORT"`
+	HTTPPort       string          `yaml:"httpPort" envconfig:"HTTP_PORT"`
 	AppName        string          `yaml:"appName" envconfig:"APP_NAME"`
 	GinMode        string          `yaml:"ginMode" envconfig:"GIN_MODE"`
 	Provider       string          `yaml:"provider" envconfig:"PROVIDER"`
