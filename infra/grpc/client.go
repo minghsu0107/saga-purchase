@@ -3,6 +3,7 @@ package grpc
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	grpc_retry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
@@ -10,8 +11,8 @@ import (
 	"github.com/sercand/kuberesolver/v3"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/balancer/roundrobin"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/keepalive"
 )
 
 var (
@@ -19,6 +20,7 @@ var (
 	ProductClientConn *ProductConn
 
 	KubernetesProvider string = "kubernetes"
+	once               sync.Once
 )
 
 // AuthConn is a wrapper for Auth grpc connection
@@ -64,7 +66,7 @@ func newGRPCConn(provider, svcHost string) (*grpc.ClientConn, error) {
 	var scheme string
 
 	if provider == KubernetesProvider {
-		kuberesolver.RegisterInCluster()
+		once.Do(kuberesolver.RegisterInCluster)
 		scheme = "kubernetes"
 	} else {
 		scheme = "dns"
@@ -73,15 +75,25 @@ func newGRPCConn(provider, svcHost string) (*grpc.ClientConn, error) {
 	retryOpts := []grpc_retry.CallOption{
 		// generate waits between 900ms to 1100ms
 		grpc_retry.WithBackoff(grpc_retry.BackoffLinearWithJitter(1*time.Second, 0.1)),
-		// retry only on NotFound and Unavailable
-		grpc_retry.WithCodes(codes.NotFound, codes.Aborted),
+		grpc_retry.WithCodes(codes.Unavailable, codes.DeadlineExceeded, codes.Canceled),
 	}
 
 	conn, err := grpc.DialContext(
 		ctx,
 		fmt.Sprintf("%s:///%s", scheme, svcHost),
 		grpc.WithInsecure(),
-		grpc.WithBalancerName(roundrobin.Name),
+		grpc.WithDisableServiceConfig(),
+		grpc.WithDefaultServiceConfig(`{
+			"loadBalancingPolicy": "round_robin",
+			"healthCheckConfig": {
+				"serviceName": ""
+			}
+		}`),
+		grpc.WithKeepaliveParams(keepalive.ClientParameters{
+			Time:                10 * time.Second, // send pings every 10 seconds if there is no activity
+			Timeout:             time.Second,      // wait 1 second for ping ack before considering the connection dead
+			PermitWithoutStream: true,             // send pings even without active streams
+		}),
 		grpc.WithStreamInterceptor(grpc_retry.StreamClientInterceptor(retryOpts...)),
 		grpc.WithUnaryInterceptor(grpc_retry.UnaryClientInterceptor(retryOpts...)),
 		//grpc.WithBlock(),
