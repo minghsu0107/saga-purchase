@@ -15,7 +15,7 @@ type Config struct {
 	HTTPPort       string          `yaml:"httpPort" envconfig:"HTTP_PORT"`
 	AppName        string          `yaml:"appName" envconfig:"APP_NAME"`
 	GinMode        string          `yaml:"ginMode" envconfig:"GIN_MODE"`
-	Provider       string          `yaml:"provider" envconfig:"PROVIDER"`
+	Resolver       string          `yaml:"resolver" envconfig:"RESOLVER"`
 	NATS           *NATS           `yaml:"nats"`
 	RPCEndpoints   *RPCEndpoints   `yaml:"rpcEndpoints"`
 	ServiceOptions *ServiceOptions `yaml:"serviceOptions"`

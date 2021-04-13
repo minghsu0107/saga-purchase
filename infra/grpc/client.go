@@ -22,8 +22,8 @@ var (
 	// ProductClientConn grpc connection
 	ProductClientConn *ProductConn
 
-	// KubernetesProvider name
-	KubernetesProvider string = "kubernetes"
+	// KubernetesResolver name
+	KubernetesResolver string = "kubernetes"
 	once               sync.Once
 )
 
@@ -40,7 +40,7 @@ type ProductConn struct {
 // NewAuthConn returns a grpc client connection for AuthRepository
 func NewAuthConn(config *conf.Config) (*AuthConn, error) {
 	log.Info("connecting to grpc auth service...")
-	conn, err := newGRPCConn(config.Provider, config.RPCEndpoints.AuthSvcHost)
+	conn, err := newGRPCConn(config.Resolver, config.RPCEndpoints.AuthSvcHost)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func NewAuthConn(config *conf.Config) (*AuthConn, error) {
 // NewProductConn returns a grpc client connection for ProductRepository
 func NewProductConn(config *conf.Config) (*ProductConn, error) {
 	log.Info("connecting to grpc product service...")
-	conn, err := newGRPCConn(config.Provider, config.RPCEndpoints.ProductSvcHost)
+	conn, err := newGRPCConn(config.Resolver, config.RPCEndpoints.ProductSvcHost)
 	if err != nil {
 		return nil, err
 	}
@@ -63,13 +63,13 @@ func NewProductConn(config *conf.Config) (*ProductConn, error) {
 	return ProductClientConn, nil
 }
 
-func newGRPCConn(provider, svcHost string) (*grpc.ClientConn, error) {
+func newGRPCConn(resolver, svcHost string) (*grpc.ClientConn, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
 	var scheme string
 
-	if provider == KubernetesProvider {
+	if resolver == KubernetesResolver {
 		once.Do(kuberesolver.RegisterInCluster)
 		scheme = "kubernetes"
 	} else {
