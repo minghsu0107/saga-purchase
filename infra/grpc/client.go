@@ -17,9 +17,12 @@ import (
 )
 
 var (
-	AuthClientConn    *AuthConn
+	// AuthClientConn grpc connection
+	AuthClientConn *AuthConn
+	// ProductClientConn grpc connection
 	ProductClientConn *ProductConn
 
+	// KubernetesProvider name
 	KubernetesProvider string = "kubernetes"
 	once               sync.Once
 )
