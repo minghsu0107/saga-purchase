@@ -12,7 +12,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
-	_ "google.golang.org/grpc/health"
 	"google.golang.org/grpc/keepalive"
 )
 
@@ -88,10 +87,7 @@ func newGRPCConn(resolver, svcHost string) (*grpc.ClientConn, error) {
 		grpc.WithInsecure(),
 		grpc.WithDisableServiceConfig(),
 		grpc.WithDefaultServiceConfig(`{
-			"loadBalancingPolicy": "round_robin",
-			"healthCheckConfig": {
-				"serviceName": ""
-			}
+			"loadBalancingPolicy": "round_robin"
 		}`),
 		grpc.WithKeepaliveParams(keepalive.ClientParameters{
 			Time:                10 * time.Second, // send pings every 10 seconds if there is no activity
