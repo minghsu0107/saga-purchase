@@ -32,15 +32,19 @@ type ProductRepositoryImpl struct {
 func NewProductRepository(conn *grpc.ProductConn, config *conf.Config) ProductRepository {
 	limiter := ratelimit.NewErroringLimiter(rate.NewLimiter(rate.Every(time.Second), config.ServiceOptions.Rps))
 
+	var options []grpctransport.ClientOption
+
 	var checkProduct endpoint.Endpoint
 	{
+		svcName := "product.ProductService"
 		checkProduct = grpctransport.NewClient(
 			conn.Conn,
-			"product.ProductService",
+			svcName,
 			"CheckProduct",
 			encodeGRPCRequest,
 			decodeGRPCResponse,
 			&pb.CheckProductsResponse{},
+			append(options, grpctransport.ClientBefore(grpctransport.SetRequestHeader(ServiceNameHeader, svcName)))...,
 		).Endpoint()
 		checkProduct = limiter(checkProduct)
 		checkProduct = circuitbreaker.Gobreaker(gobreaker.NewCircuitBreaker(gobreaker.Settings{

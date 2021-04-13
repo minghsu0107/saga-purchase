@@ -32,15 +32,20 @@ type AuthRepositoryImpl struct {
 func NewAuthRepository(conn *grpc.AuthConn, config *conf.Config) AuthRepository {
 	limiter := ratelimit.NewErroringLimiter(rate.NewLimiter(rate.Every(time.Second), config.ServiceOptions.Rps))
 
+	var options []grpctransport.ClientOption
+
 	var auth endpoint.Endpoint
 	{
+		svcName := "auth.AuthService"
+
 		auth = grpctransport.NewClient(
 			conn.Conn,
-			"auth.AuthService",
+			svcName,
 			"Auth",
 			encodeGRPCRequest,
 			decodeGRPCResponse,
 			&pb.AuthResponse{},
+			append(options, grpctransport.ClientBefore(grpctransport.SetRequestHeader(ServiceNameHeader, svcName)))...,
 		).Endpoint()
 		auth = limiter(auth)
 		auth = circuitbreaker.Gobreaker(gobreaker.NewCircuitBreaker(gobreaker.Settings{
