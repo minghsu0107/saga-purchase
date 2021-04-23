@@ -98,7 +98,7 @@ func (h *PurchasingHandler) CreatePurchase(c *gin.Context) {
 		response(c, http.StatusUnauthorized, presenter.ErrUnautorized)
 		return
 	}
-	err := h.PurchasingSvc.CreatePurchase(customerID, &curPurchase)
+	err := h.PurchasingSvc.CreatePurchase(c.Request.Context(), customerID, &curPurchase)
 	switch err {
 	case purchase.ErrProductNotfound:
 		response(c, http.StatusNotFound, purchase.ErrProductNotfound)

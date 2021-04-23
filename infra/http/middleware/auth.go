@@ -35,7 +35,7 @@ func (m *JWTAuthChecker) JWTAuth() gin.HandlerFunc {
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
-		authResult, err := m.repo.Auth(accessToken)
+		authResult, err := m.repo.Auth(c.Request.Context(), accessToken)
 		if err != nil {
 			m.logger.Error(err)
 			c.AbortWithStatus(http.StatusUnauthorized)

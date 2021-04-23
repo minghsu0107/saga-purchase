@@ -1,6 +1,8 @@
 package purchase
 
 import (
+	"context"
+
 	conf "github.com/minghsu0107/saga-purchase/config"
 	"github.com/minghsu0107/saga-purchase/domain/model"
 	"github.com/minghsu0107/saga-purchase/infra/http/presenter"
@@ -27,8 +29,8 @@ func NewPurchasingService(config *conf.Config, purchasingRepo repo.PurchasingRep
 }
 
 // CheckProduct checks the product status
-func (svc *PurchasingServiceImpl) CheckProduct(cartItems *[]model.CartItem) error {
-	productStatuses, err := svc.productRepo.CheckProduct(cartItems)
+func (svc *PurchasingServiceImpl) CheckProduct(ctx context.Context, cartItems *[]model.CartItem) error {
+	productStatuses, err := svc.productRepo.CheckProduct(ctx, cartItems)
 	if err != nil {
 		svc.logger.Error(err)
 		return err
@@ -47,7 +49,7 @@ func (svc *PurchasingServiceImpl) CheckProduct(cartItems *[]model.CartItem) erro
 }
 
 // CreatePurchase passes a CreatePurchase command to orchestrator
-func (svc *PurchasingServiceImpl) CreatePurchase(customerID uint64, purchase *presenter.Purchase) error {
+func (svc *PurchasingServiceImpl) CreatePurchase(ctx context.Context, customerID uint64, purchase *presenter.Purchase) error {
 	var cartItems []model.CartItem
 	for _, cartItem := range *(purchase.CartItems) {
 		cartItems = append(cartItems, model.CartItem{
@@ -55,7 +57,7 @@ func (svc *PurchasingServiceImpl) CreatePurchase(customerID uint64, purchase *pr
 			Amount:    cartItem.Amount,
 		})
 	}
-	err := svc.CheckProduct(&cartItems)
+	err := svc.CheckProduct(ctx, &cartItems)
 	if err != nil {
 		return err
 	}

@@ -19,12 +19,11 @@ import (
 
 // ProductRepository is the product repository interface
 type ProductRepository interface {
-	CheckProduct(cartItems *[]model.CartItem) (*[]model.ProductStatus, error)
+	CheckProduct(ctx context.Context, cartItems *[]model.CartItem) (*[]model.ProductStatus, error)
 }
 
 // ProductRepositoryImpl is the implementation of ProductRepository
 type ProductRepositoryImpl struct {
-	ctx          context.Context
 	checkProduct endpoint.Endpoint
 }
 
@@ -54,13 +53,12 @@ func NewProductRepository(conn *grpc.ProductConn, config *conf.Config) ProductRe
 	}
 
 	return &ProductRepositoryImpl{
-		ctx:          context.Background(),
 		checkProduct: checkProduct,
 	}
 }
 
 // CheckProduct method implements ProductRepository interface
-func (svc *ProductRepositoryImpl) CheckProduct(cartItems *[]model.CartItem) (*[]model.ProductStatus, error) {
+func (svc *ProductRepositoryImpl) CheckProduct(ctx context.Context, cartItems *[]model.CartItem) (*[]model.ProductStatus, error) {
 	var pbCartItems []*pb.CartItem
 	for _, cartItem := range *cartItems {
 		pbCartItems = append(pbCartItems, &pb.CartItem{
@@ -68,7 +66,7 @@ func (svc *ProductRepositoryImpl) CheckProduct(cartItems *[]model.CartItem) (*[]
 			Amount:    cartItem.Amount,
 		})
 	}
-	res, err := svc.checkProduct(svc.ctx, &pb.CheckProductsRequest{
+	res, err := svc.checkProduct(ctx, &pb.CheckProductsRequest{
 		CartItems: pbCartItems,
 	})
 	if err != nil {

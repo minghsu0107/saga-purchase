@@ -202,12 +202,12 @@ var _ = Describe("router", func() {
 			})
 			It("should success when passing valid access token", func() {
 				mockAuthRepo.EXPECT().
-					Auth(tokenString).Return(&model.AuthResult{
+					Auth(context.Background(), tokenString).Return(&model.AuthResult{
 					CustomerID: customerID,
 					Expired:    false,
 				}, nil)
 				mockPurchasingSvc.EXPECT().
-					CreatePurchase(customerID, &testPurchase).Return(nil)
+					CreatePurchase(gomock.Any(), customerID, &testPurchase).Return(nil)
 				w := GetResponseWithBearerToken(server.Engine, "POST", tokenString, purchasingEndpoint, body)
 				Expect(w.Code).To(Equal(201))
 			})
@@ -219,7 +219,7 @@ var _ = Describe("router", func() {
 			It("should fail if access token is not valid", func() {
 				Context("when access token expired", func() {
 					mockAuthRepo.EXPECT().
-						Auth(tokenString).Return(&model.AuthResult{
+						Auth(context.Background(), tokenString).Return(&model.AuthResult{
 						CustomerID: customerID,
 						Expired:    true,
 					}, nil)
@@ -228,7 +228,7 @@ var _ = Describe("router", func() {
 				})
 				Context("when access token is invalid", func() {
 					mockAuthRepo.EXPECT().
-						Auth(tokenString).Return(nil, errors.New("invalid token"))
+						Auth(context.Background(), tokenString).Return(nil, errors.New("invalid token"))
 					w := GetResponseWithBearerToken(server.Engine, "POST", tokenString, purchasingEndpoint, body)
 					Expect(w.Code).To(Equal(401))
 				})
@@ -241,7 +241,7 @@ var _ = Describe("router", func() {
 		Describe("before streaming purchase result", func() {
 			It("should success when passing valid access token", func() {
 				mockAuthRepo.EXPECT().
-					Auth(tokenString).Return(&model.AuthResult{
+					Auth(context.Background(), tokenString).Return(&model.AuthResult{
 					CustomerID: customerID,
 					Expired:    false,
 				}, nil)
@@ -255,7 +255,7 @@ var _ = Describe("router", func() {
 			})
 			It("should receive empty object if there is no purchase result", func() {
 				mockAuthRepo.EXPECT().
-					Auth(tokenString).Return(&model.AuthResult{
+					Auth(context.Background(), tokenString).Return(&model.AuthResult{
 					CustomerID: customerID,
 					Expired:    false,
 				}, nil)
@@ -275,7 +275,7 @@ var _ = Describe("router", func() {
 			It("should fail if access token is not valid", func() {
 				Context("when access token expired", func() {
 					mockAuthRepo.EXPECT().
-						Auth(tokenString).Return(&model.AuthResult{
+						Auth(context.Background(), tokenString).Return(&model.AuthResult{
 						CustomerID: customerID,
 						Expired:    true,
 					}, nil)
@@ -284,7 +284,7 @@ var _ = Describe("router", func() {
 				})
 				Context("when access token is invalid", func() {
 					mockAuthRepo.EXPECT().
-						Auth(tokenString).Return(nil, errors.New("invalid token"))
+						Auth(context.Background(), tokenString).Return(nil, errors.New("invalid token"))
 					w := GetResponseWithBearerToken(server.Engine, "GET", tokenString, purchaseResultEndpoint, nil)
 					Expect(w.Code).To(Equal(401))
 				})

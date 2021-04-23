@@ -19,12 +19,11 @@ import (
 
 // AuthRepository is the auth repository interface
 type AuthRepository interface {
-	Auth(accessToken string) (*model.AuthResult, error)
+	Auth(ctx context.Context, accessToken string) (*model.AuthResult, error)
 }
 
 // AuthRepositoryImpl is the implementation of AuthRepository
 type AuthRepositoryImpl struct {
-	ctx  context.Context
 	auth endpoint.Endpoint
 }
 
@@ -55,14 +54,13 @@ func NewAuthRepository(conn *grpc.AuthConn, config *conf.Config) AuthRepository 
 	}
 
 	return &AuthRepositoryImpl{
-		ctx:  context.Background(),
 		auth: auth,
 	}
 }
 
 // Auth method implements AuthRepository interface
-func (repo *AuthRepositoryImpl) Auth(accessToken string) (*model.AuthResult, error) {
-	res, err := repo.auth(repo.ctx, &pb.AuthPayload{
+func (repo *AuthRepositoryImpl) Auth(ctx context.Context, accessToken string) (*model.AuthResult, error) {
+	res, err := repo.auth(ctx, &pb.AuthPayload{
 		AccessToken: accessToken,
 	})
 	if err != nil {
