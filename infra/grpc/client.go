@@ -3,6 +3,7 @@ package grpc
 import (
 	"context"
 	"fmt"
+	"os"
 	"sync"
 	"time"
 
@@ -10,6 +11,7 @@ import (
 	conf "github.com/minghsu0107/saga-purchase/config"
 	"github.com/sercand/kuberesolver/v3"
 	log "github.com/sirupsen/logrus"
+	"go.opencensus.io/plugin/ocgrpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/keepalive"
@@ -81,10 +83,15 @@ func newGRPCConn(resolver, svcHost string) (*grpc.ClientConn, error) {
 		grpc_retry.WithCodes(codes.NotFound, codes.Aborted),
 	}
 
-	conn, err := grpc.DialContext(
-		ctx,
-		fmt.Sprintf("%s:///%s", scheme, svcHost),
+	dialOpts := []grpc.DialOption{
 		grpc.WithInsecure(),
+	}
+
+	if os.Getenv("OC_AGENT_HOST") != "" {
+		dialOpts = append(dialOpts, grpc.WithStatsHandler(new(ocgrpc.ClientHandler)))
+	}
+
+	dialOpts = append(dialOpts,
 		grpc.WithDisableServiceConfig(),
 		grpc.WithDefaultServiceConfig(`{
 			"loadBalancingPolicy": "round_robin"
@@ -97,6 +104,12 @@ func newGRPCConn(resolver, svcHost string) (*grpc.ClientConn, error) {
 		grpc.WithStreamInterceptor(grpc_retry.StreamClientInterceptor(retryOpts...)),
 		grpc.WithUnaryInterceptor(grpc_retry.UnaryClientInterceptor(retryOpts...)),
 		//grpc.WithBlock(),
+	)
+
+	conn, err := grpc.DialContext(
+		ctx,
+		fmt.Sprintf("%s:///%s", scheme, svcHost),
+		dialOpts...,
 	)
 	if err != nil {
 		return nil, err
