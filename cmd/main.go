@@ -36,10 +36,6 @@ func main() {
 			log.Fatalf("failed to create ocagent-exporter: %v", err)
 		}
 		trace.RegisterExporter(oce)
-		trace.ApplyConfig(trace.Config{
-			//DefaultSampler: trace.ProbabilitySampler(0.2),
-			DefaultSampler: trace.AlwaysSample(),
-		})
 	}
 	if promPort != "" {
 		// Start prometheus server
