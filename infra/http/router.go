@@ -50,7 +50,11 @@ func (h *PurchaseResultStreamHandler) Validate(r *http.Request, msg *message.Mes
 	if err != nil {
 		return
 	}
-	customerID := r.Context().Value(config.CustomerKey).(uint64)
+	customerID, valid := r.Context().Value(config.CustomerKey).(uint64)
+	if !valid {
+		return
+	}
+
 	if customerID == purchaseResult.CustomerId {
 		r = r.WithContext(context.WithValue(r.Context(), config.MsgKey, h.PurchaseResultSvc.MapPurchaseResult(purchaseResult)))
 		ok = true
