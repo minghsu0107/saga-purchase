@@ -16,7 +16,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.0.1-0.20190118093823-f849b5445de4
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/leodido/go-urn v1.2.1 // indirect
-	github.com/minghsu0107/saga-pb v0.5.0
+	github.com/minghsu0107/saga-pb v0.5.1
 	github.com/nats-io/stan.go v0.8.3
 	github.com/onsi/ginkgo v1.7.0
 	github.com/onsi/gomega v1.4.3
