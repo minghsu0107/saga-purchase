@@ -19,12 +19,12 @@ import (
 
 // ProductRepository is the product repository interface
 type ProductRepository interface {
-	CheckProduct(ctx context.Context, cartItems *[]model.CartItem) (*[]model.ProductStatus, error)
+	CheckProducts(ctx context.Context, cartItems *[]model.CartItem) (*[]model.ProductStatus, error)
 }
 
 // ProductRepositoryImpl is the implementation of ProductRepository
 type ProductRepositoryImpl struct {
-	checkProduct endpoint.Endpoint
+	checkProducts endpoint.Endpoint
 }
 
 // NewProductRepository is the factory of AuthRepository
@@ -33,32 +33,32 @@ func NewProductRepository(conn *grpc.ProductConn, config *conf.Config) ProductRe
 
 	var options []grpctransport.ClientOption
 
-	var checkProduct endpoint.Endpoint
+	var checkProducts endpoint.Endpoint
 	{
 		svcName := "product.ProductService"
-		checkProduct = grpctransport.NewClient(
+		checkProducts = grpctransport.NewClient(
 			conn.Conn,
 			svcName,
-			"CheckProduct",
+			"CheckProducts",
 			encodeGRPCRequest,
 			decodeGRPCResponse,
 			&pb.CheckProductsResponse{},
 			append(options, grpctransport.ClientBefore(grpctransport.SetRequestHeader(ServiceNameHeader, svcName)))...,
 		).Endpoint()
-		checkProduct = limiter(checkProduct)
-		checkProduct = circuitbreaker.Gobreaker(gobreaker.NewCircuitBreaker(gobreaker.Settings{
+		checkProducts = limiter(checkProducts)
+		checkProducts = circuitbreaker.Gobreaker(gobreaker.NewCircuitBreaker(gobreaker.Settings{
 			Name:    "product",
 			Timeout: config.ServiceOptions.Timeout,
-		}))(checkProduct)
+		}))(checkProducts)
 	}
 
 	return &ProductRepositoryImpl{
-		checkProduct: checkProduct,
+		checkProducts: checkProducts,
 	}
 }
 
 // CheckProduct method implements ProductRepository interface
-func (svc *ProductRepositoryImpl) CheckProduct(ctx context.Context, cartItems *[]model.CartItem) (*[]model.ProductStatus, error) {
+func (svc *ProductRepositoryImpl) CheckProducts(ctx context.Context, cartItems *[]model.CartItem) (*[]model.ProductStatus, error) {
 	var pbCartItems []*pb.CartItem
 	for _, cartItem := range *cartItems {
 		pbCartItems = append(pbCartItems, &pb.CartItem{
@@ -66,7 +66,7 @@ func (svc *ProductRepositoryImpl) CheckProduct(ctx context.Context, cartItems *[
 			Amount:    cartItem.Amount,
 		})
 	}
-	res, err := svc.checkProduct(ctx, &pb.CheckProductsRequest{
+	res, err := svc.checkProducts(ctx, &pb.CheckProductsRequest{
 		CartItems: pbCartItems,
 	})
 	if err != nil {

@@ -29,8 +29,8 @@ func NewPurchasingService(config *conf.Config, purchasingRepo repo.PurchasingRep
 }
 
 // CheckProduct checks the product status
-func (svc *PurchasingServiceImpl) CheckProduct(ctx context.Context, cartItems *[]model.CartItem) error {
-	productStatuses, err := svc.productRepo.CheckProduct(ctx, cartItems)
+func (svc *PurchasingServiceImpl) CheckProducts(ctx context.Context, cartItems *[]model.CartItem) error {
+	productStatuses, err := svc.productRepo.CheckProducts(ctx, cartItems)
 	if err != nil {
 		svc.logger.Error(err)
 		return err
@@ -57,7 +57,7 @@ func (svc *PurchasingServiceImpl) CreatePurchase(ctx context.Context, customerID
 			Amount:    cartItem.Amount,
 		})
 	}
-	err := svc.CheckProduct(ctx, &cartItems)
+	err := svc.CheckProducts(ctx, &cartItems)
 	if err != nil {
 		return err
 	}

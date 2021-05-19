@@ -6,11 +6,11 @@ import (
 
 	pb "github.com/minghsu0107/saga-pb"
 	"github.com/minghsu0107/saga-purchase/config"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/ThreeDotsLabs/watermill/message/router/middleware"
-	"github.com/golang/protobuf/ptypes"
 	"github.com/minghsu0107/saga-purchase/domain/model"
 )
 
@@ -49,10 +49,8 @@ func (r *PurchasingRepositoryImpl) CreatePurchase(purchase *model.Purchase) erro
 			CurrencyCode: purchase.Payment.CurrencyCode,
 		},
 	}
-	curTime, err := ptypes.TimestampProto(time.Now())
-	if err != nil {
-		return err
-	}
+
+	curTime := timestamppb.New(time.Now())
 	createPurchaseCommand := &pb.CreatePurchase{
 		Purchase:  pbPurchase,
 		Timestamp: curTime,
