@@ -52,7 +52,7 @@ func TestRouter(t *testing.T) {
 type MockSubscriber struct{}
 
 type MockPurchaseResultSvc struct {
-	PurchaseResult *event.PurchaseResult
+	dummyPurchaseResult *event.PurchaseResult
 }
 
 func (m MockPurchaseResultSvc) MapPurchaseResult(purchaseResult *pb.PurchaseResult) *event.PurchaseResult {
@@ -62,7 +62,7 @@ func (m MockPurchaseResultSvc) GetPurchaseResult(req *http.Request) (*event.Purc
 	if isDummyPurchaseResultNil {
 		return nil, nil
 	}
-	return m.PurchaseResult, nil
+	return m.dummyPurchaseResult, nil
 }
 
 type CustomClaims struct {
@@ -83,11 +83,12 @@ func InitMocks() {
 	mockAuthRepo = mock_repo.NewMockAuthRepository(mockCtrl)
 
 	dummyPurchaseResult = &event.PurchaseResult{
-		Step:   "dummpstep",
-		Status: "dummystatus",
+		PurchaseID: 101,
+		Step:       "dummpstep",
+		Status:     "dummystatus",
 	}
 	mockPurchaseResultSvc = MockPurchaseResultSvc{
-		PurchaseResult: dummyPurchaseResult,
+		dummyPurchaseResult: dummyPurchaseResult,
 	}
 	mockPurchasingSvc = mock_service.NewMockPurchasingService(mockCtrl)
 }
@@ -249,9 +250,11 @@ var _ = Describe("router", func() {
 
 				w := GetResponseWithBearerToken(server.Engine, "GET", tokenString, purchaseResultEndpoint, nil)
 				Expect(w.Code).To(Equal(200))
-				receivedPurchaseResult := &event.PurchaseResult{}
+				receivedPurchaseResult := &presenter.PurchaseResult{}
 				GetJSON(w, receivedPurchaseResult)
-				Expect(receivedPurchaseResult).To(Equal(dummyPurchaseResult))
+				Expect(receivedPurchaseResult.PurchaseID).To(Equal(dummyPurchaseResult.PurchaseID))
+				Expect(receivedPurchaseResult.Status).To(Equal(dummyPurchaseResult.Status))
+				Expect(receivedPurchaseResult.Step).To(Equal(dummyPurchaseResult.Step))
 			})
 			It("should receive empty object if there is no purchase result", func() {
 				mockAuthRepo.EXPECT().
@@ -263,9 +266,9 @@ var _ = Describe("router", func() {
 
 				w := GetResponseWithBearerToken(server.Engine, "GET", tokenString, purchaseResultEndpoint, nil)
 				Expect(w.Code).To(Equal(200))
-				receivedPurchaseResult := &event.PurchaseResult{}
+				receivedPurchaseResult := &presenter.PurchaseResult{}
 				GetJSON(w, receivedPurchaseResult)
-				Expect(receivedPurchaseResult).To(Equal(&event.PurchaseResult{}))
+				Expect(receivedPurchaseResult).To(Equal(&presenter.PurchaseResult{}))
 			})
 			It("should fail if using wrong method", func() {
 				w := GetResponseWithBearerToken(server.Engine, "POST", tokenString, purchaseResultEndpoint, nil)

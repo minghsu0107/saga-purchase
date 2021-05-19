@@ -34,9 +34,11 @@ var _ = BeforeSuite(func() {
 
 var _ = Describe("result service", func() {
 	It("should pass purchase result to http request context correctly", func() {
+		var purchaseID uint64 = 1
 		purchaseResult := &event.PurchaseResult{
-			Step:   "dummpstep",
-			Status: "dummystatus",
+			PurchaseID: purchaseID,
+			Step:       "dummpstep",
+			Status:     "dummystatus",
 		}
 		r := &http.Request{}
 		r = r.WithContext(context.WithValue(r.Context(), conf.MsgKey, purchaseResult))

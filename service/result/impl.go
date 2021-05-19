@@ -26,15 +26,18 @@ func NewPurchaseResultService(config *conf.Config) PurchaseResultService {
 
 // MapPurchaseResult maps protobuf purchase result to a purchase result domain entity
 func (svc *PurchaseResultServiceImpl) MapPurchaseResult(purchaseResult *pb.PurchaseResult) *event.PurchaseResult {
+	purchaseID := purchaseResult.PurchaseId
 	step := getPurchaseStep(purchaseResult.Step)
 	status := getPurchaseStatus(purchaseResult.Status)
 	svc.logger.WithFields(log.Fields{
-		"step":   step,
-		"status": status,
+		"purchase_id": purchaseID,
+		"step":        step,
+		"status":      status,
 	}).Info("new purchase result")
 	return &event.PurchaseResult{
-		Step:   step,
-		Status: status,
+		PurchaseID: purchaseID,
+		Step:       step,
+		Status:     status,
 	}
 }
 

@@ -6,7 +6,8 @@ import (
 
 // PurchaseResult event
 type PurchaseResult struct {
-	Step      string
-	Status    string
-	Timestamp time.Time
+	PurchaseID uint64
+	Step       string
+	Status     string
+	Timestamp  time.Time
 }

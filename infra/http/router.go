@@ -71,10 +71,12 @@ func (h *PurchaseResultStreamHandler) GetResponse(w http.ResponseWriter, r *http
 	if purchaseResult == nil {
 		return nil, true
 	}
+
 	return &presenter.PurchaseResult{
-		Step:      purchaseResult.Step,
-		Status:    purchaseResult.Status,
-		Timestamp: time.Now().Local().Unix(),
+		PurchaseID: purchaseResult.PurchaseID,
+		Step:       purchaseResult.Step,
+		Status:     purchaseResult.Status,
+		Timestamp:  time.Now().Local().Unix(),
 	}, true
 }
 
