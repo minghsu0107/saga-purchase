@@ -7,10 +7,11 @@ import (
 	"github.com/google/wire"
 	conf "github.com/minghsu0107/saga-purchase/config"
 	"github.com/minghsu0107/saga-purchase/infra"
-	"github.com/minghsu0107/saga-purchase/infra/broker"
-	"github.com/minghsu0107/saga-purchase/infra/grpc"
-	"github.com/minghsu0107/saga-purchase/infra/http"
+	infra_broker "github.com/minghsu0107/saga-purchase/infra/broker"
+	infra_grpc "github.com/minghsu0107/saga-purchase/infra/grpc"
+	infra_http "github.com/minghsu0107/saga-purchase/infra/http"
 	"github.com/minghsu0107/saga-purchase/infra/http/middleware"
+	infra_observe "github.com/minghsu0107/saga-purchase/infra/observe"
 	"github.com/minghsu0107/saga-purchase/repo"
 	"github.com/minghsu0107/saga-purchase/service/purchase"
 	"github.com/minghsu0107/saga-purchase/service/result"
@@ -22,20 +23,22 @@ func InitializeServer() (*infra.Server, error) {
 
 		infra.NewServer,
 
-		http.NewServer,
-		http.NewEngine,
-		http.NewRouter,
-		http.NewPurchaseResultStreamHandler,
-		http.NewPurchasingHandler,
+		infra_http.NewServer,
+		infra_http.NewEngine,
+		infra_http.NewRouter,
+		infra_http.NewPurchaseResultStreamHandler,
+		infra_http.NewPurchasingHandler,
+
+		infra_observe.NewObservibilityInjector,
 
 		middleware.NewJWTAuthChecker,
 
-		grpc.NewAuthConn,
-		grpc.NewProductConn,
+		infra_grpc.NewAuthConn,
+		infra_grpc.NewProductConn,
 
-		broker.NewSSERouter,
-		broker.NewNATSSubscriber,
-		broker.NewNATSPublisher,
+		infra_broker.NewSSERouter,
+		infra_broker.NewNATSSubscriber,
+		infra_broker.NewNATSPublisher,
 
 		result.NewPurchaseResultService,
 		purchase.NewPurchasingService,

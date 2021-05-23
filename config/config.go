@@ -13,6 +13,8 @@ import (
 // Config is a type for general configuration
 type Config struct {
 	HTTPPort       string          `yaml:"httpPort" envconfig:"HTTP_PORT"`
+	PromPort       string          `yaml:"promPort" envconfig:"PROM_PORT"`
+	OcAgentHost    string          `yaml:"ocAgentHost" envconfig:"OC_AGENT_HOST"`
 	AppName        string          `yaml:"appName" envconfig:"APP_NAME"`
 	GinMode        string          `yaml:"ginMode" envconfig:"GIN_MODE"`
 	Resolver       string          `yaml:"resolver" envconfig:"RESOLVER"`

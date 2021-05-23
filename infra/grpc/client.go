@@ -3,7 +3,6 @@ package grpc
 import (
 	"context"
 	"fmt"
-	"os"
 	"sync"
 	"time"
 
@@ -41,7 +40,7 @@ type ProductConn struct {
 // NewAuthConn returns a grpc client connection for AuthRepository
 func NewAuthConn(config *conf.Config) (*AuthConn, error) {
 	log.Info("connecting to grpc auth service...")
-	conn, err := newGRPCConn(config.Resolver, config.RPCEndpoints.AuthSvcHost)
+	conn, err := newGRPCConn(config.Resolver, config.RPCEndpoints.AuthSvcHost, config.OcAgentHost)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +53,7 @@ func NewAuthConn(config *conf.Config) (*AuthConn, error) {
 // NewProductConn returns a grpc client connection for ProductRepository
 func NewProductConn(config *conf.Config) (*ProductConn, error) {
 	log.Info("connecting to grpc product service...")
-	conn, err := newGRPCConn(config.Resolver, config.RPCEndpoints.ProductSvcHost)
+	conn, err := newGRPCConn(config.Resolver, config.RPCEndpoints.ProductSvcHost, config.OcAgentHost)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +63,7 @@ func NewProductConn(config *conf.Config) (*ProductConn, error) {
 	return ProductClientConn, nil
 }
 
-func newGRPCConn(resolver, svcHost string) (*grpc.ClientConn, error) {
+func newGRPCConn(resolver, svcHost, ocAgentHost string) (*grpc.ClientConn, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
@@ -87,7 +86,7 @@ func newGRPCConn(resolver, svcHost string) (*grpc.ClientConn, error) {
 		grpc.WithInsecure(),
 	}
 
-	if os.Getenv("OC_AGENT_HOST") != "" {
+	if ocAgentHost != "" {
 		dialOpts = append(dialOpts, grpc.WithStatsHandler(new(ocgrpc.ClientHandler)))
 	}
 

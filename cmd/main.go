@@ -2,8 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -11,41 +9,13 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"contrib.go.opencensus.io/exporter/ocagent"
 	"github.com/minghsu0107/saga-purchase/dep"
 	"github.com/minghsu0107/saga-purchase/infra/broker"
 	"github.com/minghsu0107/saga-purchase/infra/grpc"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"go.opencensus.io/trace"
-)
-
-var (
-	promPort    = os.Getenv("PROM_PORT")
-	ocagentHost = os.Getenv("OC_AGENT_HOST")
 )
 
 func main() {
 	errs := make(chan error, 1)
-	if ocagentHost != "" {
-		oce, err := ocagent.NewExporter(
-			ocagent.WithInsecure(),
-			ocagent.WithReconnectionPeriod(5*time.Second),
-			ocagent.WithAddress(ocagentHost),
-			ocagent.WithServiceName("purchase"))
-		if err != nil {
-			log.Fatalf("failed to create ocagent-exporter: %v", err)
-		}
-		trace.RegisterExporter(oce)
-	}
-	if promPort != "" {
-		// Start prometheus server
-		go func() {
-			log.Infof("starting prom metrics on PROM_PORT=[%s]", promPort)
-			http.Handle("/metrics", promhttp.Handler())
-			err := http.ListenAndServe(fmt.Sprintf(":%s", promPort), nil)
-			errs <- err
-		}()
-	}
 
 	server, err := dep.InitializeServer()
 	if err != nil {

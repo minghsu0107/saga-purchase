@@ -12,6 +12,7 @@ import (
 	"github.com/minghsu0107/saga-purchase/infra/grpc"
 	"github.com/minghsu0107/saga-purchase/infra/http"
 	"github.com/minghsu0107/saga-purchase/infra/http/middleware"
+	"github.com/minghsu0107/saga-purchase/infra/observe"
 	"github.com/minghsu0107/saga-purchase/repo"
 	"github.com/minghsu0107/saga-purchase/service/purchase"
 	"github.com/minghsu0107/saga-purchase/service/result"
@@ -55,6 +56,10 @@ func InitializeServer() (*infra.Server, error) {
 	authRepository := repo.NewAuthRepository(authConn, configConfig)
 	jwtAuthChecker := middleware.NewJWTAuthChecker(configConfig, authRepository)
 	server := http.NewServer(configConfig, engine, router, sseRouter, jwtAuthChecker)
-	infraServer := infra.NewServer(server)
+	observibilityInjector, err := pkg.NewObservibilityInjector(configConfig)
+	if err != nil {
+		return nil, err
+	}
+	infraServer := infra.NewServer(server, observibilityInjector)
 	return infraServer, nil
 }
