@@ -98,7 +98,7 @@ func NewTestServer() *Server {
 		Logger: &conf.Logger{
 			Writer: ioutil.Discard,
 			ContextLogger: log.WithFields(log.Fields{
-				"app_name": "test",
+				"app": "test",
 			}),
 		},
 	}

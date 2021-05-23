@@ -1,6 +1,8 @@
-httpPort: 80
-appName: "purchase"
+app: "purchase"
 ginMode: "debug"
+httpPort: 80
+promPort: 8080
+ocAgentHost: ""
 resolver: ""
 nats:
   clusterID: "test-cluster"

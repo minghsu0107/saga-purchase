@@ -12,11 +12,11 @@ import (
 
 // Config is a type for general configuration
 type Config struct {
+	App            string          `yaml:"app" envconfig:"APP"`
+	GinMode        string          `yaml:"ginMode" envconfig:"GIN_MODE"`
 	HTTPPort       string          `yaml:"httpPort" envconfig:"HTTP_PORT"`
 	PromPort       string          `yaml:"promPort" envconfig:"PROM_PORT"`
 	OcAgentHost    string          `yaml:"ocAgentHost" envconfig:"OC_AGENT_HOST"`
-	AppName        string          `yaml:"appName" envconfig:"APP_NAME"`
-	GinMode        string          `yaml:"ginMode" envconfig:"GIN_MODE"`
 	Resolver       string          `yaml:"resolver" envconfig:"RESOLVER"`
 	NATS           *NATS           `yaml:"nats"`
 	RPCEndpoints   *RPCEndpoints   `yaml:"rpcEndpoints"`
@@ -56,7 +56,7 @@ func NewConfig() (*Config, error) {
 	if err := readEnv(&config); err != nil {
 		return nil, err
 	}
-	config.Logger = newLogger(config.AppName)
+	config.Logger = newLogger(config.App)
 	log.SetOutput(config.Logger.Writer)
 
 	config.ServiceOptions.Timeout = time.Duration(config.ServiceOptions.TimeoutSecond) * time.Second
