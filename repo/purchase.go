@@ -51,7 +51,7 @@ func (r *PurchasingRepositoryImpl) CreatePurchase(purchase *model.Purchase) erro
 	}
 
 	curTime := timestamppb.New(time.Now())
-	createPurchaseCommand := &pb.CreatePurchase{
+	createPurchaseCommand := &pb.CreatePurchaseCmd{
 		Purchase:  pbPurchase,
 		Timestamp: curTime,
 	}

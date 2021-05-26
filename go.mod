@@ -15,7 +15,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.0.1-0.20190118093823-f849b5445de4
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/leodido/go-urn v1.2.1 // indirect
-	github.com/minghsu0107/saga-pb v0.5.2
+	github.com/minghsu0107/saga-pb v0.5.3
 	github.com/nats-io/stan.go v0.8.3
 	github.com/onsi/ginkgo v1.7.0
 	github.com/onsi/gomega v1.4.3
@@ -26,11 +26,11 @@ require (
 	github.com/sony/gobreaker v0.4.1
 	github.com/ugorji/go v1.1.14 // indirect
 	go.opencensus.io v0.23.0
-	golang.org/x/net v0.0.0-20210521195947-fe42d452be8f // indirect
+	golang.org/x/net v0.0.0-20210525063256-abc453219eb5 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
 	golang.org/x/sys v0.0.0-20210525143221-35b2ab0089ea // indirect
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
-	google.golang.org/genproto v0.0.0-20210521181308-5ccab8a35a9a // indirect
+	google.golang.org/genproto v0.0.0-20210524171403-669157292da3 // indirect
 	google.golang.org/grpc v1.38.0
 	google.golang.org/protobuf v1.26.0
 	gopkg.in/yaml.v2 v2.3.0
