@@ -71,6 +71,7 @@ func (svc *PurchasingServiceImpl) CreatePurchase(ctx context.Context, customerID
 		},
 	}
 	if err := svc.purchasingRepo.CreatePurchase(newPurchase); err != nil {
+		svc.logger.Error(err)
 		return err
 	}
 	return nil
