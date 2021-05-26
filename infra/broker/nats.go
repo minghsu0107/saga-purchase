@@ -1,11 +1,14 @@
 package broker
 
 import (
-	"github.com/ThreeDotsLabs/watermill/message"
+	"fmt"
 
 	"github.com/ThreeDotsLabs/watermill-nats/pkg/nats"
+	"github.com/ThreeDotsLabs/watermill/components/metrics"
+	"github.com/ThreeDotsLabs/watermill/message"
 	conf "github.com/minghsu0107/saga-purchase/config"
 	stan "github.com/nats-io/stan.go"
+	prom "github.com/prometheus/client_golang/prometheus"
 )
 
 // Publisher singleton
@@ -32,6 +35,15 @@ func NewNATSPublisher(config *conf.Config) (message.Publisher, error) {
 		return nil, err
 	}
 
+	registry, ok := prom.DefaultGatherer.(*prom.Registry)
+	if !ok {
+		return nil, fmt.Errorf("prometheus type casting error")
+	}
+	metricsBuilder := metrics.NewPrometheusMetricsBuilder(registry, config.App, "pubsub")
+	Publisher, err = metricsBuilder.DecoratePublisher(Publisher)
+	if err != nil {
+		return nil, err
+	}
 	return Publisher, nil
 }
 
@@ -57,5 +69,14 @@ func NewNATSSubscriber(config *conf.Config) (message.Subscriber, error) {
 		return nil, err
 	}
 
+	registry, ok := prom.DefaultGatherer.(*prom.Registry)
+	if !ok {
+		return nil, fmt.Errorf("prometheus type casting error")
+	}
+	metricsBuilder := metrics.NewPrometheusMetricsBuilder(registry, config.App, "pubsub")
+	Subscriber, err = metricsBuilder.DecorateSubscriber(Subscriber)
+	if err != nil {
+		return nil, err
+	}
 	return Subscriber, nil
 }
