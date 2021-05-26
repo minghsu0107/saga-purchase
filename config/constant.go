@@ -12,5 +12,5 @@ const (
 	// PurchaseTopic is the topic to which we publish new purchase
 	PurchaseTopic = "purchase"
 	// PurchaseResultTopic is the subscribed topic for purchase result
-	PurchaseResultTopic = "purchase_result"
+	PurchaseResultTopic = "purchase.result"
 )
