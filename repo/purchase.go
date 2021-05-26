@@ -33,12 +33,14 @@ func NewPurchasingRepository(publisher message.Publisher) PurchasingRepository {
 
 // CreatePurchase publish a CreatePurchase command to the message broker
 func (r *PurchasingRepositoryImpl) CreatePurchase(purchase *model.Purchase) error {
+	var amount int64 = 0
 	var purchasedItems []*pb.PurchasedItem
 	for _, cartItem := range *purchase.Order.CartItems {
 		purchasedItems = append(purchasedItems, &pb.PurchasedItem{
 			ProductId: cartItem.ProductID,
 			Amount:    cartItem.Amount,
 		})
+		amount += cartItem.Amount
 	}
 	pbPurchase := &pb.Purchase{
 		Order: &pb.Order{
@@ -47,6 +49,7 @@ func (r *PurchasingRepositoryImpl) CreatePurchase(purchase *model.Purchase) erro
 		},
 		Payment: &pb.Payment{
 			CurrencyCode: purchase.Payment.CurrencyCode,
+			Amount:       amount,
 		},
 	}
 
