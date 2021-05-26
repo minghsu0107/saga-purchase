@@ -57,11 +57,11 @@ func (svc *PurchaseResultServiceImpl) GetPurchaseResult(req *http.Request) (*eve
 func getPurchaseStep(step pb.PurchaseStep) string {
 	switch step {
 	case pb.PurchaseStep_STEP_UPDATE_PRODUCT_INVENTORY:
-		return "UPDATE_PRODUCT_INVENTORY"
+		return event.StepUpdateProductInventory
 	case pb.PurchaseStep_STEP_CREATE_ORDER:
-		return "CREATE_ORDER"
+		return event.StepCreateOrder
 	case pb.PurchaseStep_STEP_CREATE_PAYMENT:
-		return "CREATE_PAYMENT"
+		return event.StepCreatePayment
 	}
 	return ""
 }
@@ -69,15 +69,15 @@ func getPurchaseStep(step pb.PurchaseStep) string {
 func getPurchaseStatus(status pb.PurchaseStatus) string {
 	switch status {
 	case pb.PurchaseStatus_STATUS_EXUCUTE:
-		return "STATUS_EXUCUTE"
+		return event.StatusExecute
 	case pb.PurchaseStatus_STATUS_SUCCESS:
-		return "STATUS_SUCCESS"
+		return event.StatusSucess
 	case pb.PurchaseStatus_STATUS_FAILED:
-		return "STATUS_FAILED"
+		return event.StatusFailed
 	case pb.PurchaseStatus_STATUS_ROLLBACKED:
-		return "STATUS_ROLLBACKED"
+		return event.StatusRollbacked
 	case pb.PurchaseStatus_STATUS_ROLLBACK_FAIL:
-		return "STATUS_ROLLBACK_FAIL"
+		return event.StatusRollbackFailed
 	}
 	return ""
 }
