@@ -30,6 +30,11 @@ func NewPurchasingService(config *conf.Config, purchasingRepo repo.PurchasingRep
 
 // CheckProduct checks the product status
 func (svc *PurchasingServiceImpl) CheckProducts(ctx context.Context, cartItems *[]model.CartItem) error {
+	for _, cartcartItem := range *cartItems {
+		if cartcartItem.Amount <= 0 {
+			return ErrInvalidCartItemAmount
+		}
+	}
 	productStatuses, err := svc.productRepo.CheckProducts(ctx, cartItems)
 	if err != nil {
 		svc.logger.Error(err)

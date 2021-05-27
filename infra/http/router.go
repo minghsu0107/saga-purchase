@@ -106,6 +106,12 @@ func (h *PurchasingHandler) CreatePurchase(c *gin.Context) {
 	}
 	err := h.PurchasingSvc.CreatePurchase(c.Request.Context(), customerID, &curPurchase)
 	switch err {
+	case purchase.ErrInvalidCartItemAmount:
+		response(c, http.StatusBadRequest, presenter.ErrInvalidParam)
+		return
+	case purchase.ErrUnkownProductStatus:
+		response(c, http.StatusBadRequest, presenter.ErrInvalidParam)
+		return
 	case purchase.ErrProductNotfound:
 		response(c, http.StatusNotFound, purchase.ErrProductNotfound)
 	case nil:
