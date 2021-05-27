@@ -58,7 +58,7 @@ func NewProductRepository(conn *grpc.ProductConn, config *conf.Config) ProductRe
 }
 
 // CheckProduct method implements ProductRepository interface
-func (svc *ProductRepositoryImpl) CheckProducts(ctx context.Context, cartItems *[]model.CartItem) (*[]model.ProductStatus, error) {
+func (r *ProductRepositoryImpl) CheckProducts(ctx context.Context, cartItems *[]model.CartItem) (*[]model.ProductStatus, error) {
 	var pbCartItems []*pb.CartItem
 	for _, cartItem := range *cartItems {
 		pbCartItems = append(pbCartItems, &pb.CartItem{
@@ -66,7 +66,7 @@ func (svc *ProductRepositoryImpl) CheckProducts(ctx context.Context, cartItems *
 			Amount:    cartItem.Amount,
 		})
 	}
-	res, err := svc.checkProducts(ctx, &pb.CheckProductsRequest{
+	res, err := r.checkProducts(ctx, &pb.CheckProductsRequest{
 		CartItems: pbCartItems,
 	})
 	if err != nil {
