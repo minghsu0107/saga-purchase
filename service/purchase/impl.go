@@ -37,7 +37,7 @@ func (svc *PurchasingServiceImpl) CheckProducts(ctx context.Context, cartItems *
 	}
 	productStatuses, err := svc.productRepo.CheckProducts(ctx, cartItems)
 	if err != nil {
-		svc.logger.Error(err)
+		svc.logger.Error(err.Error())
 		return err
 	}
 	for _, productStatus := range *productStatuses {
@@ -76,7 +76,7 @@ func (svc *PurchasingServiceImpl) CreatePurchase(ctx context.Context, customerID
 		},
 	}
 	if err := svc.purchasingRepo.CreatePurchase(newPurchase); err != nil {
-		svc.logger.Error(err)
+		svc.logger.Error(err.Error())
 		return err
 	}
 	return nil
