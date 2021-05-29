@@ -67,8 +67,8 @@ func (svc *PurchasingServiceImpl) CreatePurchase(ctx context.Context, customerID
 		return err
 	}
 	var amount int64 = 0
-	for _, productStatus := range *productStatuses {
-		amount += productStatus.Price
+	for i, productStatus := range *productStatuses {
+		amount += cartItems[i].Amount * productStatus.Price
 	}
 	newPurchase := &model.Purchase{
 		Order: &model.Order{
