@@ -29,28 +29,28 @@ func NewPurchasingService(config *conf.Config, purchasingRepo repo.PurchasingRep
 }
 
 // CheckProduct checks the product status
-func (svc *PurchasingServiceImpl) CheckProducts(ctx context.Context, cartItems *[]model.CartItem) error {
+func (svc *PurchasingServiceImpl) CheckProducts(ctx context.Context, cartItems *[]model.CartItem) (*[]model.ProductStatus, error) {
 	for _, cartcartItem := range *cartItems {
 		if cartcartItem.Amount <= 0 {
-			return ErrInvalidCartItemAmount
+			return nil, ErrInvalidCartItemAmount
 		}
 	}
 	productStatuses, err := svc.productRepo.CheckProducts(ctx, cartItems)
 	if err != nil {
 		svc.logger.Error(err.Error())
-		return err
+		return nil, err
 	}
 	for _, productStatus := range *productStatuses {
-		switch productStatus {
+		switch productStatus.Status {
 		case model.ProductOk:
 			continue
 		case model.ProductNotFound:
-			return ErrProductNotfound
+			return nil, ErrProductNotfound
 		default:
-			return ErrUnkownProductStatus
+			return nil, ErrUnkownProductStatus
 		}
 	}
-	return nil
+	return productStatuses, nil
 }
 
 // CreatePurchase passes a CreatePurchase command to orchestrator
@@ -62,9 +62,13 @@ func (svc *PurchasingServiceImpl) CreatePurchase(ctx context.Context, customerID
 			Amount:    cartItem.Amount,
 		})
 	}
-	err := svc.CheckProducts(ctx, &cartItems)
+	productStatuses, err := svc.CheckProducts(ctx, &cartItems)
 	if err != nil {
 		return err
+	}
+	var amount int64 = 0
+	for _, productStatus := range *productStatuses {
+		amount += productStatus.Price
 	}
 	newPurchase := &model.Purchase{
 		Order: &model.Order{
@@ -73,8 +77,10 @@ func (svc *PurchasingServiceImpl) CreatePurchase(ctx context.Context, customerID
 		},
 		Payment: &model.Payment{
 			CurrencyCode: purchase.Payment.CurrencyCode,
+			Amount:       amount,
 		},
 	}
+
 	if err := svc.purchasingRepo.CreatePurchase(newPurchase); err != nil {
 		svc.logger.Error(err.Error())
 		return err

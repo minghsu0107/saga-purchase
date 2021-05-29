@@ -75,12 +75,16 @@ func (r *ProductRepositoryImpl) CheckProducts(ctx context.Context, cartItems *[]
 	checkProductsResponse := res.(*pb.CheckProductsResponse)
 	var productStatuses []model.ProductStatus
 	for _, productStatus := range checkProductsResponse.ProductStatuses {
-		productStatuses = append(productStatuses, getProductStatus(productStatus.Status))
+		productStatuses = append(productStatuses, model.ProductStatus{
+			ProductID: productStatus.ProductId,
+			Price:     productStatus.Price,
+			Status:    getProductStatus(productStatus.Status),
+		})
 	}
 	return &productStatuses, nil
 }
 
-func getProductStatus(status pb.Status) model.ProductStatus {
+func getProductStatus(status pb.Status) model.Status {
 	switch status {
 	case pb.Status_STATUS_OK:
 		return model.ProductOk
