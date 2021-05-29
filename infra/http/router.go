@@ -1,7 +1,6 @@
 package http
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 	"time"
@@ -50,24 +49,31 @@ func (h *PurchaseResultStreamHandler) Validate(r *http.Request, msg *message.Mes
 	if err != nil {
 		return
 	}
+
 	customerID, valid := r.Context().Value(config.CustomerKey).(uint64)
 	if !valid {
 		return
 	}
 
 	if customerID == purchaseResult.CustomerId {
-		r = r.WithContext(context.WithValue(r.Context(), config.MsgKey, h.PurchaseResultSvc.MapPurchaseResult(purchaseResult)))
 		ok = true
 	}
 	return
 }
 
 // GetResponse is the http handler that generates SSE responses
-func (h *PurchaseResultStreamHandler) GetResponse(w http.ResponseWriter, r *http.Request) (response interface{}, ok bool) {
-	purchaseResult, err := h.PurchaseResultSvc.GetPurchaseResult(r)
+func (h *PurchaseResultStreamHandler) GetResponse(w http.ResponseWriter, r *http.Request, msg *message.Message) (response interface{}, ok bool) {
+	if msg == nil {
+		return nil, true
+	}
+
+	pbPurchaseResult := &pb.PurchaseResult{}
+	err := json.Unmarshal(msg.Payload, pbPurchaseResult)
 	if err != nil {
 		return nil, false
 	}
+	purchaseResult := h.PurchaseResultSvc.MapPurchaseResult(pbPurchaseResult)
+
 	if purchaseResult == nil {
 		return nil, true
 	}

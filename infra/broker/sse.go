@@ -1,16 +1,17 @@
 package broker
 
 import (
-	watermillHTTP "github.com/ThreeDotsLabs/watermill-http/pkg/http"
+	pkg "github.com/minghsu0107/saga-purchase/pkg"
+
 	"github.com/ThreeDotsLabs/watermill/message"
 )
 
 // NewSSERouter returns a server-sent-events router
-func NewSSERouter(subsciber message.Subscriber) (*watermillHTTP.SSERouter, error) {
-	sseRouter, err := watermillHTTP.NewSSERouter(
-		watermillHTTP.SSERouterConfig{
+func NewSSERouter(subsciber message.Subscriber) (*pkg.SSERouter, error) {
+	sseRouter, err := pkg.NewSSERouter(
+		pkg.SSERouterConfig{
 			UpstreamSubscriber: subsciber,
-			ErrorHandler:       watermillHTTP.DefaultErrorHandler,
+			ErrorHandler:       pkg.DefaultErrorHandler,
 		},
 		logger,
 	)

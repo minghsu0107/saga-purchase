@@ -5,10 +5,10 @@ go 1.15
 require (
 	contrib.go.opencensus.io/exporter/ocagent v0.7.0
 	github.com/ThreeDotsLabs/watermill v1.1.1
-	github.com/ThreeDotsLabs/watermill-http v1.1.3
 	github.com/ThreeDotsLabs/watermill-nats v1.0.5
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.6.3
+	github.com/go-chi/render v1.0.1
 	github.com/go-kit/kit v0.10.0
 	github.com/golang/mock v1.4.4
 	github.com/google/wire v0.4.0
@@ -19,6 +19,7 @@ require (
 	github.com/nats-io/stan.go v0.8.3
 	github.com/onsi/ginkgo v1.7.0
 	github.com/onsi/gomega v1.4.3
+	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.9.0
 	github.com/sercand/kuberesolver/v3 v3.0.0
 	github.com/sirupsen/logrus v1.8.0

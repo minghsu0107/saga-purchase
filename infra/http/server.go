@@ -5,10 +5,10 @@ import (
 	"io"
 	"net/http"
 
-	watermillHTTP "github.com/ThreeDotsLabs/watermill-http/pkg/http"
 	"github.com/gin-gonic/gin"
 	conf "github.com/minghsu0107/saga-purchase/config"
 	"github.com/minghsu0107/saga-purchase/infra/http/middleware"
+	"github.com/minghsu0107/saga-purchase/pkg"
 	log "github.com/sirupsen/logrus"
 	metrics "github.com/slok/go-http-metrics/metrics/prometheus"
 	prommiddleware "github.com/slok/go-http-metrics/middleware"
@@ -22,7 +22,7 @@ type Server struct {
 	Engine         *gin.Engine
 	Router         *Router
 	svr            *http.Server
-	sseRouter      *watermillHTTP.SSERouter
+	sseRouter      *pkg.SSERouter
 	jwtAuthChecker *middleware.JWTAuthChecker
 }
 
@@ -52,7 +52,7 @@ func NewEngine(config *conf.Config) *gin.Engine {
 }
 
 // NewServer is the factory for server instance
-func NewServer(config *conf.Config, engine *gin.Engine, router *Router, sseRouter *watermillHTTP.SSERouter, jwtAuthChecker *middleware.JWTAuthChecker) *Server {
+func NewServer(config *conf.Config, engine *gin.Engine, router *Router, sseRouter *pkg.SSERouter, jwtAuthChecker *middleware.JWTAuthChecker) *Server {
 	return &Server{
 		Port:           config.HTTPPort,
 		Engine:         engine,

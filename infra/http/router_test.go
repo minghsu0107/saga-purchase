@@ -20,9 +20,7 @@ import (
 	mock_repo "github.com/minghsu0107/saga-purchase/mock/repo"
 
 	"github.com/golang/mock/gomock"
-	pb "github.com/minghsu0107/saga-pb"
 	conf "github.com/minghsu0107/saga-purchase/config"
-	"github.com/minghsu0107/saga-purchase/domain/event"
 	"github.com/minghsu0107/saga-purchase/domain/model"
 	"github.com/minghsu0107/saga-purchase/infra/broker"
 	mock_service "github.com/minghsu0107/saga-purchase/mock/service"
@@ -35,12 +33,9 @@ var (
 	mockCtrl              *gomock.Controller
 	mockSubscriber        *MockSubscriber
 	mockAuthRepo          *mock_repo.MockAuthRepository
-	mockPurchaseResultSvc MockPurchaseResultSvc
+	mockPurchaseResultSvc *mock_service.MockPurchaseResultService
 	mockPurchasingSvc     *mock_service.MockPurchasingService
 	server                *Server
-
-	dummyPurchaseResult      *event.PurchaseResult
-	isDummyPurchaseResultNil bool
 )
 
 func TestRouter(t *testing.T) {
@@ -50,20 +45,6 @@ func TestRouter(t *testing.T) {
 }
 
 type MockSubscriber struct{}
-
-type MockPurchaseResultSvc struct {
-	dummyPurchaseResult *event.PurchaseResult
-}
-
-func (m MockPurchaseResultSvc) MapPurchaseResult(purchaseResult *pb.PurchaseResult) *event.PurchaseResult {
-	return nil
-}
-func (m MockPurchaseResultSvc) GetPurchaseResult(req *http.Request) (*event.PurchaseResult, error) {
-	if isDummyPurchaseResultNil {
-		return nil, nil
-	}
-	return m.dummyPurchaseResult, nil
-}
 
 type CustomClaims struct {
 	CustomerID uint64
@@ -81,15 +62,6 @@ func (ms *MockSubscriber) Close() error {
 
 func InitMocks() {
 	mockAuthRepo = mock_repo.NewMockAuthRepository(mockCtrl)
-
-	dummyPurchaseResult = &event.PurchaseResult{
-		PurchaseID: 101,
-		Step:       "dummpstep",
-		Status:     "dummystatus",
-	}
-	mockPurchaseResultSvc = MockPurchaseResultSvc{
-		dummyPurchaseResult: dummyPurchaseResult,
-	}
 	mockPurchasingSvc = mock_service.NewMockPurchasingService(mockCtrl)
 }
 
@@ -240,29 +212,12 @@ var _ = Describe("router", func() {
 			})
 		})
 		Describe("before streaming purchase result", func() {
-			It("should success when passing valid access token", func() {
-				mockAuthRepo.EXPECT().
-					Auth(context.Background(), tokenString).Return(&model.AuthResult{
-					CustomerID: customerID,
-					Expired:    false,
-				}, nil)
-				isDummyPurchaseResultNil = false
-
-				w := GetResponseWithBearerToken(server.Engine, "GET", tokenString, purchaseResultEndpoint, nil)
-				Expect(w.Code).To(Equal(200))
-				receivedPurchaseResult := &presenter.PurchaseResult{}
-				GetJSON(w, receivedPurchaseResult)
-				Expect(receivedPurchaseResult.PurchaseID).To(Equal(dummyPurchaseResult.PurchaseID))
-				Expect(receivedPurchaseResult.Status).To(Equal(dummyPurchaseResult.Status))
-				Expect(receivedPurchaseResult.Step).To(Equal(dummyPurchaseResult.Step))
-			})
 			It("should receive empty object if there is no purchase result", func() {
 				mockAuthRepo.EXPECT().
 					Auth(context.Background(), tokenString).Return(&model.AuthResult{
 					CustomerID: customerID,
 					Expired:    false,
 				}, nil)
-				isDummyPurchaseResultNil = true
 
 				w := GetResponseWithBearerToken(server.Engine, "GET", tokenString, purchaseResultEndpoint, nil)
 				Expect(w.Code).To(Equal(200))

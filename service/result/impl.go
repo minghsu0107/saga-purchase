@@ -1,9 +1,6 @@
 package result
 
 import (
-	"fmt"
-	"net/http"
-
 	pb "github.com/minghsu0107/saga-pb"
 	conf "github.com/minghsu0107/saga-purchase/config"
 	"github.com/minghsu0107/saga-purchase/domain/event"
@@ -39,19 +36,6 @@ func (svc *PurchaseResultServiceImpl) MapPurchaseResult(purchaseResult *pb.Purch
 		Step:       step,
 		Status:     status,
 	}
-}
-
-// GetPurchaseResult retrieves purchase result from http request context
-func (svc *PurchaseResultServiceImpl) GetPurchaseResult(req *http.Request) (*event.PurchaseResult, error) {
-	val := req.Context().Value(conf.MsgKey)
-	if val == nil {
-		return nil, nil
-	}
-	purchaseResult, ok := val.(*event.PurchaseResult)
-	if !ok {
-		return nil, fmt.Errorf("error when casting purchase result")
-	}
-	return purchaseResult, nil
 }
 
 func getPurchaseStep(step pb.PurchaseStep) string {
