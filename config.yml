@@ -7,10 +7,14 @@ resolver: ""
 nats:
   clusterID: "test-cluster"
   url: "nats://127.0.0.1:4222"
-  clientID: "" # should be overrided by env
+  clientID: "" # will be randomly generated if not specified
+  # should not have queue group to avoid message loss when running multiple replicas
   queueGroup: ""
-  durableName: "purchase-svc-durable"
-  subscriberCount: 1
+  # no need durability; will use default subscription options are used.
+	# The default start position is to receive new messages only 
+  # (messages published after the subscription is registered in the cluster)
+  durableName: ""
+  subscriberCount: 1 # should be set to one to avoid duplication
 rpcEndpoints:
   authSvcHost: ""
   productSvcHost: ""

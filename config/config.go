@@ -4,6 +4,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/ThreeDotsLabs/watermill"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/kelseyhightower/envconfig"
@@ -58,7 +59,9 @@ func NewConfig() (*Config, error) {
 	}
 	config.Logger = newLogger(config.App)
 	log.SetOutput(config.Logger.Writer)
-
+	if config.NATS.ClientID == "" {
+		config.NATS.ClientID = watermill.NewShortUUID()
+	}
 	config.ServiceOptions.Timeout = time.Duration(config.ServiceOptions.TimeoutSecond) * time.Second
 	return &config, nil
 }
