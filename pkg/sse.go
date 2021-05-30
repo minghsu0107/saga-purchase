@@ -4,12 +4,12 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/go-chi/render"
-	"github.com/pkg/errors"
-
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/ThreeDotsLabs/watermill/pubsub/gochannel"
+	"github.com/go-chi/render"
+	"github.com/pkg/errors"
+	"go.opencensus.io/trace"
 )
 
 type StreamAdapter interface {
@@ -187,6 +187,9 @@ func (h sseHandler) handleEventStream(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h sseHandler) processMessage(w http.ResponseWriter, r *http.Request, msg *message.Message) (interface{}, bool) {
+	_, span := trace.StartSpan(msg.Context(), r.URL.Path)
+	defer span.End()
+
 	ok := h.streamAdapter.Validate(r, msg)
 	if !ok {
 		return nil, false

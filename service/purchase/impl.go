@@ -81,7 +81,7 @@ func (svc *PurchasingServiceImpl) CreatePurchase(ctx context.Context, customerID
 		},
 	}
 
-	if err := svc.purchasingRepo.CreatePurchase(newPurchase); err != nil {
+	if err := svc.purchasingRepo.CreatePurchase(ctx, newPurchase); err != nil {
 		svc.logger.Error(err.Error())
 		return err
 	}
