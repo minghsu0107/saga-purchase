@@ -35,7 +35,7 @@ func NewPurchasingRepository(publisher message.Publisher) PurchasingRepository {
 
 // CreatePurchase publish a CreatePurchase command to the message broker
 func (r *PurchasingRepositoryImpl) CreatePurchase(ctx context.Context, purchase *model.Purchase) error {
-	childCtx, span := trace.StartSpan(ctx, "event.CreatePurchase")
+	_, span := trace.StartSpan(ctx, "event.CreatePurchase")
 	defer span.End()
 
 	var purchasedItems []*pb.PurchasedItem
@@ -67,7 +67,12 @@ func (r *PurchasingRepositoryImpl) CreatePurchase(ctx context.Context, purchase 
 	}
 
 	msg := message.NewMessage(watermill.NewUUID(), payload)
-	msg.SetContext(childCtx)
+
+	spanContext, err := json.Marshal(span.SpanContext())
+	if err != nil {
+		return err
+	}
+	msg.Metadata.Set(conf.SpanContextKey, string(spanContext))
 	middleware.SetCorrelationID(watermill.NewUUID(), msg)
 
 	if err := r.publisher.Publish(conf.PurchaseTopic, msg); err != nil {
