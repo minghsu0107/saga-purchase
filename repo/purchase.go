@@ -13,6 +13,7 @@ import (
 	"github.com/minghsu0107/saga-purchase/domain/model"
 
 	"go.opencensus.io/trace"
+	"go.opencensus.io/trace/propagation"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -67,12 +68,7 @@ func (r *PurchasingRepositoryImpl) CreatePurchase(ctx context.Context, purchase 
 	}
 
 	msg := message.NewMessage(watermill.NewUUID(), payload)
-
-	spanContext, err := json.Marshal(span.SpanContext())
-	if err != nil {
-		return err
-	}
-	msg.Metadata.Set(conf.SpanContextKey, string(spanContext))
+	msg.Metadata.Set(conf.SpanContextKey, string(propagation.Binary(span.SpanContext())))
 	middleware.SetCorrelationID(watermill.NewUUID(), msg)
 
 	if err := r.publisher.Publish(conf.PurchaseTopic, msg); err != nil {
