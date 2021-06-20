@@ -67,7 +67,7 @@ func (s *Server) RegisterRoutes() {
 	purchaseGroup := s.Engine.Group("/api/purchase")
 	purchaseGroup.Use(s.jwtAuthChecker.JWTAuth())
 	{
-		purchaseGroup.POST("/", s.Router.PurchasingHandler.CreatePurchase)
+		purchaseGroup.POST("", s.Router.PurchasingHandler.CreatePurchase)
 		purchaseGroup.GET("/result", gin.WrapF(s.sseRouter.AddHandler(conf.PurchaseResultTopic, s.Router.PurchaseResultStreamHandler)))
 	}
 	go func() {
