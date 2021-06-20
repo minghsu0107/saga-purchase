@@ -123,7 +123,7 @@ var _ = Describe("router", func() {
 	var purchasingEndpoint string
 	var purchaseResultEndpoint string
 	BeforeEach(func() {
-		purchasingEndpoint = "/api/purchase/"
+		purchasingEndpoint = "/api/purchase"
 		purchaseResultEndpoint = "/api/purchase/result"
 	})
 	Describe("test unauthorized request", func() {
