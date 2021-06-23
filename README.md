@@ -31,7 +31,7 @@ OC_AGENT_HOST=oc-collector:55678 \
 - `RPC_AUTH_SVC_HOST`: gRPC account service host
 - `RPC_PRODUCT_SVC_HOST`: gRPC product service host
 ## Running in Docker
-See [docker-compose example](https://github.com/minghsu0107/saga-example/blob/a47f998fee6112941133a08ad4dd75e5a342b0bf/docker-compose.yaml#L23) for details.
+See [docker-compose example](https://github.com/minghsu0107/saga-example/blob/main/docker-compose.yaml) for details.
 ## Exported Metrics
 | Metric                                                                                                                                   | Description                                                                                                 | Labels                                                           |
 | ---------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
