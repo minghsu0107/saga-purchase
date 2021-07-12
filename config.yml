@@ -12,8 +12,8 @@ nats:
   # should not have queue group to avoid message loss 
   # when running multiple replicas
   queueGroup: ""
-   # no need durability; will use default subscription options are used
-   # the default start position is to receive new messages only 
+   # no need durability; default subscription options are used
+   # which is to receive new messages only 
    # (messages published after the subscription is registered in the cluster)
   durableName: ""
   # should be set to one to avoid duplication
