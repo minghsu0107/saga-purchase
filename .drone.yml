@@ -30,6 +30,25 @@ steps:
   when:
     event:
     - push
+- name: sonar-scanner
+  image: sonarsource/sonar-scanner-cli:4.6
+  commands:
+  - >
+    sonar-scanner
+    -Dsonar.host.url=https://sample-beta.csie.org
+    -Dsonar.login=f1afcedfef800763db9454c040b0265cff496cc5
+    -Dsonar.projectKey=minghsu0107_saga-purchase
+    -Dsonar.projectVersion=${DRONE_BUILD_NUMBER}
+    -Dsonar.projectBaseDir=$PWD
+    -Dsonar.links.homepage=${DRONE_REPO_LINK}
+    -Dsonar.links.ci=${DRONE_BUILD_LINK}
+    -Dsonar.branch.name=${DRONE_COMMIT_BRANCH}
+    -Dsonar.sources=.
+    -Dsonar.go.coverage.reportPaths=cover.out
+    -Dsonar.exclusions=**/*.pb.go,**/*.pb.gw.go,**/*_test.go,**/*_mock.go
+  when:
+    event:
+    - push
 - name: push-registry
   <<: *x-build-docker-image
   settings:
