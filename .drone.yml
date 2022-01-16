@@ -32,11 +32,16 @@ steps:
     - push
 - name: sonar-scanner
   image: sonarsource/sonar-scanner-cli:4.6
+  environment:
+    SONAR_HOST:
+      from_secret: sonar_host
+    SONAR_LOGIN_TOKEN:
+      from_secret: sonar_login_token
   commands:
   - >
     sonar-scanner
-    -Dsonar.host.url=https://sample-beta.csie.org
-    -Dsonar.login=f1afcedfef800763db9454c040b0265cff496cc5
+    -Dsonar.host.url=$SONAR_HOST
+    -Dsonar.login=$SONAR_LOGIN_TOKEN
     -Dsonar.projectKey=minghsu0107_saga-purchase
     -Dsonar.projectVersion=${DRONE_BUILD_NUMBER}
     -Dsonar.projectBaseDir=$PWD
