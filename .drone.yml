@@ -46,6 +46,8 @@ steps:
     -Dsonar.sources=.
     -Dsonar.go.coverage.reportPaths=cover.out
     -Dsonar.exclusions=**/*.pb.go,**/*.pb.gw.go,**/*_test.go,**/*_mock.go
+  depends_on:
+    - test
   when:
     event:
     - push
