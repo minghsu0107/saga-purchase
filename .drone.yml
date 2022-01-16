@@ -28,8 +28,6 @@ steps:
   - go mod download
   - make test
   when:
-    branch:
-    - main
     event:
     - push
 - name: push-registry
