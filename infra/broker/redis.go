@@ -14,7 +14,6 @@ import (
 	prom "github.com/prometheus/client_golang/prometheus"
 )
 
-// Subscriber singleton
 var (
 	Subscriber  message.Subscriber
 	RedisClient redis.UniversalClient

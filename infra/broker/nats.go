@@ -11,7 +11,6 @@ import (
 	prom "github.com/prometheus/client_golang/prometheus"
 )
 
-// Publisher singleton
 var Publisher message.Publisher
 
 // NewNATSPublisher returns a NATS publisher for event streaming
