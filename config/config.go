@@ -20,6 +20,7 @@ type Config struct {
 	OcAgentHost    string          `yaml:"ocAgentHost" envconfig:"OC_AGENT_HOST"`
 	Resolver       string          `yaml:"resolver" envconfig:"RESOLVER"`
 	NATS           *NATS           `yaml:"nats"`
+	RedisConfig    *RedisConfig    `yaml:"redisConfig"`
 	RPCEndpoints   *RPCEndpoints   `yaml:"rpcEndpoints"`
 	ServiceOptions *ServiceOptions `yaml:"serviceOptions"`
 	Logger         *Logger
@@ -33,6 +34,17 @@ type NATS struct {
 	QueueGroup      string `yaml:"queueGroup" envconfig:"NATS_QUEUE_GROUP"`
 	DurableName     string `yaml:"durableName" envconfig:"NATS_DURABLE_NAME"`
 	SubscriberCount int    `yaml:"subscriberCount" envconfig:"NATS_SUBSCRIBER_COUNT"`
+}
+
+// RedisConfig is redis config type
+type RedisConfig struct {
+	Addrs              string `yaml:"addrs" envconfig:"REDIS_ADDRS"`
+	Password           string `yaml:"password" envconfig:"REDIS_PASSWORD"`
+	DB                 int    `yaml:"db" envconfig:"REDIS_DB"`
+	PoolSize           int    `yaml:"poolSize" envconfig:"REDIS_POOL_SIZE"`
+	MaxRetries         int    `yaml:"maxRetries" envconfig:"REDIS_MAX_RETRIES"`
+	ExpirationSeconds  int64  `yaml:"expirationSeconds" envconfig:"REDIS_EXPIRATION_SECONDS"`
+	IdleTimeoutSeconds int64  `yaml:"idleTimeoutSeconds" envconfig:"REDIS_IDLE_TIMEOUT_SECONDS"`
 }
 
 // RPCEndpoints wraps all rpc server urls

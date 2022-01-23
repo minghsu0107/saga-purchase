@@ -41,7 +41,7 @@ func InitializeServer() (*infra.Server, error) {
 	purchasingService := purchase.NewPurchasingService(configConfig, purchasingRepository, productRepository)
 	purchasingHandler := http.NewPurchasingHandler(purchasingService)
 	router := http.NewRouter(purchaseResultStreamHandler, purchasingHandler)
-	subscriber, err := broker.NewNATSSubscriber(configConfig)
+	subscriber, err := broker.NewRedisSubscriber(configConfig)
 	if err != nil {
 		return nil, err
 	}

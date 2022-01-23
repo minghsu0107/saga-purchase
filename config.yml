@@ -18,6 +18,14 @@ nats:
   durableName: ""
   # should be set to one to avoid duplication
   subscriberCount: 1
+redisConfig:
+  addrs: "127.0.0.1:7000"
+  password: "pass.123"
+  db: 0
+  poolSize: 10
+  maxRetries: 3
+  expirationSeconds: 900
+  idleTimeoutSeconds: 30
 rpcEndpoints:
   authSvcHost: ""
   productSvcHost: ""

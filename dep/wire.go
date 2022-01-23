@@ -37,7 +37,7 @@ func InitializeServer() (*infra.Server, error) {
 		infra_grpc.NewProductConn,
 
 		infra_broker.NewSSERouter,
-		infra_broker.NewNATSSubscriber,
+		infra_broker.NewRedisSubscriber,
 		infra_broker.NewNATSPublisher,
 
 		result.NewPurchaseResultService,
