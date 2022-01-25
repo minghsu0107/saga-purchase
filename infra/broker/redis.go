@@ -40,9 +40,14 @@ func NewRedisSubscriber(config *conf.Config) (message.Subscriber, error) {
 	Subscriber, err = redistream.NewSubscriber(
 		ctx,
 		redistream.SubscriberConfig{
-			Consumer:        "consumer1",
-			ConsumerGroup:   "test-consumer-group",
-			DoNotDelMessage: false,
+			Consumer: config.RedisConfig.Subscriber.ConsumerID,
+			// use fan-out mode if leaved empty
+			ConsumerGroup: config.RedisConfig.Subscriber.ConsumerGroup,
+
+			// messages idling longer than this period will be claimed by the current subscriber
+			// newly joined subscriber will try to claim pending messages immediately and then claim every 5 seconds
+			// configure this only when ConsumerGroup is not empty
+			// MaxIdleTime: time.Second * 60,
 		},
 		RedisClient,
 		&redistream.DefaultMarshaler{},
