@@ -3,13 +3,10 @@ package http
 import (
 	"encoding/json"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	pb "github.com/minghsu0107/saga-pb"
-
-	"path"
 
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/minghsu0107/saga-purchase/config"
@@ -52,16 +49,12 @@ func (h *PurchaseResultStreamHandler) Validate(r *http.Request, msg *message.Mes
 	if err != nil {
 		return
 	}
-	purchaseID, err := strconv.ParseUint(path.Base(r.URL.Path), 10, 64)
-	if err != nil {
-		return
-	}
 	customerID, valid := r.Context().Value(config.CustomerKey).(uint64)
 	if !valid {
 		return
 	}
 
-	if (customerID == purchaseResult.CustomerId) && (purchaseID == purchaseResult.PurchaseId) {
+	if customerID == purchaseResult.CustomerId {
 		ok = true
 	}
 	return

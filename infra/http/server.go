@@ -68,7 +68,7 @@ func (s *Server) RegisterRoutes() {
 	purchaseGroup.Use(s.jwtAuthChecker.JWTAuth())
 	{
 		purchaseGroup.POST("", s.Router.PurchasingHandler.CreatePurchase)
-		purchaseGroup.GET("/result/:id", gin.WrapF(s.sseRouter.AddHandler(conf.PurchaseResultTopic, s.Router.PurchaseResultStreamHandler)))
+		purchaseGroup.GET("/result", gin.WrapF(s.sseRouter.AddHandler(conf.PurchaseResultTopic, s.Router.PurchaseResultStreamHandler)))
 	}
 	go func() {
 		err := s.sseRouter.Run(context.Background())
