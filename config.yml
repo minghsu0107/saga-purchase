@@ -29,7 +29,7 @@ redisConfig:
   subscriber:
     # will be randomly generated if not specified
     consumerID: ""
-    # should not have queue group to avoid message loss when running multiple replicas
+    # should not have consumer group to avoid message loss when running multiple replicas
     consumerGroup: ""
 rpcEndpoints:
   authSvcHost: ""
