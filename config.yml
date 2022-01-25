@@ -4,20 +4,20 @@ httpPort: 80
 promPort: 8080
 ocAgentHost: ""
 resolver: ""
-nats:
+natsConfig:
   clusterID: "test-cluster"
   url: "nats://127.0.0.1:4222"
   # will be randomly generated if not specified
   clientID: ""
-  # should not have queue group to avoid message loss 
-  # when running multiple replicas
-  queueGroup: ""
-   # no need durability; default subscription options are used
-   # which is to receive new messages only 
-   # (messages published after the subscription is registered in the cluster)
-  durableName: ""
-  # should be set to one to avoid duplication
-  subscriberCount: 1
+  subscriber:
+    # should not have queue group to avoid message loss when running multiple replicas
+    queueGroup: ""
+    # no need durability; default subscription options are used
+    # which is to receive new messages only 
+    # (messages published after the subscription is registered in the cluster)
+    durableName: ""
+    # should be set to one to avoid duplication
+    count: 1
 redisConfig:
   addrs: "127.0.0.1:7000"
   password: "pass.123"
@@ -26,6 +26,11 @@ redisConfig:
   maxRetries: 3
   expirationSeconds: 900
   idleTimeoutSeconds: 30
+  subscriber:
+    # will be randomly generated if not specified
+    consumerID: ""
+    # should not have queue group to avoid message loss when running multiple replicas
+    consumerGroup: ""
 rpcEndpoints:
   authSvcHost: ""
   productSvcHost: ""
