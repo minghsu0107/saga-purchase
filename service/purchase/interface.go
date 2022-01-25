@@ -10,5 +10,5 @@ import (
 // PurchasingService is the interface of purchasing service
 type PurchasingService interface {
 	CheckProducts(ctx context.Context, cartItems *[]model.CartItem) (*[]model.ProductStatus, error)
-	CreatePurchase(ctx context.Context, customerID uint64, purchase *presenter.Purchase) error
+	CreatePurchase(ctx context.Context, customerID uint64, purchase *presenter.Purchase) (uint64, error)
 }

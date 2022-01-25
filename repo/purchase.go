@@ -59,8 +59,9 @@ func (r *PurchasingRepositoryImpl) CreatePurchase(ctx context.Context, purchase 
 
 	curTime := timestamppb.New(time.Now())
 	createPurchaseCommand := &pb.CreatePurchaseCmd{
-		Purchase:  pbPurchase,
-		Timestamp: curTime,
+		PurchaseId: purchase.ID,
+		Purchase:   pbPurchase,
+		Timestamp:  curTime,
 	}
 	payload, err := json.Marshal(createPurchaseCommand)
 	if err != nil {

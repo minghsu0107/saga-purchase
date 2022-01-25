@@ -12,6 +12,7 @@ import (
 	infra_http "github.com/minghsu0107/saga-purchase/infra/http"
 	"github.com/minghsu0107/saga-purchase/infra/http/middleware"
 	infra_observe "github.com/minghsu0107/saga-purchase/infra/observe"
+	"github.com/minghsu0107/saga-purchase/pkg"
 	"github.com/minghsu0107/saga-purchase/repo"
 	"github.com/minghsu0107/saga-purchase/service/purchase"
 	"github.com/minghsu0107/saga-purchase/service/result"
@@ -42,6 +43,8 @@ func InitializeServer() (*infra.Server, error) {
 
 		result.NewPurchaseResultService,
 		purchase.NewPurchasingService,
+
+		pkg.NewSonyFlake,
 
 		repo.NewAuthRepository,
 		repo.NewPurchasingRepository,

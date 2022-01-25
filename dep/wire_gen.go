@@ -12,7 +12,8 @@ import (
 	"github.com/minghsu0107/saga-purchase/infra/grpc"
 	"github.com/minghsu0107/saga-purchase/infra/http"
 	"github.com/minghsu0107/saga-purchase/infra/http/middleware"
-	"github.com/minghsu0107/saga-purchase/infra/observe"
+	pkg2 "github.com/minghsu0107/saga-purchase/infra/observe"
+	"github.com/minghsu0107/saga-purchase/pkg"
 	"github.com/minghsu0107/saga-purchase/repo"
 	"github.com/minghsu0107/saga-purchase/service/purchase"
 	"github.com/minghsu0107/saga-purchase/service/result"
@@ -28,6 +29,10 @@ func InitializeServer() (*infra.Server, error) {
 	engine := http.NewEngine(configConfig)
 	purchaseResultService := result.NewPurchaseResultService(configConfig)
 	purchaseResultStreamHandler := http.NewPurchaseResultStreamHandler(purchaseResultService)
+	idGenerator, err := pkg.NewSonyFlake()
+	if err != nil {
+		return nil, err
+	}
 	publisher, err := broker.NewNATSPublisher(configConfig)
 	if err != nil {
 		return nil, err
@@ -38,7 +43,7 @@ func InitializeServer() (*infra.Server, error) {
 		return nil, err
 	}
 	productRepository := repo.NewProductRepository(productConn, configConfig)
-	purchasingService := purchase.NewPurchasingService(configConfig, purchasingRepository, productRepository)
+	purchasingService := purchase.NewPurchasingService(configConfig, idGenerator, purchasingRepository, productRepository)
 	purchasingHandler := http.NewPurchasingHandler(purchasingService)
 	router := http.NewRouter(purchaseResultStreamHandler, purchasingHandler)
 	subscriber, err := broker.NewRedisSubscriber(configConfig)
@@ -56,7 +61,7 @@ func InitializeServer() (*infra.Server, error) {
 	authRepository := repo.NewAuthRepository(authConn, configConfig)
 	jwtAuthChecker := middleware.NewJWTAuthChecker(configConfig, authRepository)
 	server := http.NewServer(configConfig, engine, router, sseRouter, jwtAuthChecker)
-	observibilityInjector, err := pkg.NewObservibilityInjector(configConfig)
+	observibilityInjector, err := pkg2.NewObservibilityInjector(configConfig)
 	if err != nil {
 		return nil, err
 	}

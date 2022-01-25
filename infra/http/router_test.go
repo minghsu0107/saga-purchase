@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"testing"
 	"time"
 
@@ -122,9 +123,10 @@ var _ = AfterSuite(func() {
 var _ = Describe("router", func() {
 	var purchasingEndpoint string
 	var purchaseResultEndpoint string
+	var purchaseID uint64 = 13132
 	BeforeEach(func() {
 		purchasingEndpoint = "/api/purchase"
-		purchaseResultEndpoint = "/api/purchase/result"
+		purchaseResultEndpoint = "/api/purchase/result/" + strconv.FormatUint(purchaseID, 10)
 	})
 	Describe("test unauthorized request", func() {
 		It("should return 401 unauthorized when trying to create purchase", func() {
@@ -180,7 +182,7 @@ var _ = Describe("router", func() {
 					Expired:    false,
 				}, nil)
 				mockPurchasingSvc.EXPECT().
-					CreatePurchase(gomock.Any(), customerID, &testPurchase).Return(nil)
+					CreatePurchase(gomock.Any(), customerID, &testPurchase).Return(purchaseID, nil)
 				w := GetResponseWithBearerToken(server.Engine, "POST", tokenString, purchasingEndpoint, body)
 				Expect(w.Code).To(Equal(201))
 			})

@@ -27,6 +27,7 @@ require (
 	github.com/sirupsen/logrus v1.8.0
 	github.com/slok/go-http-metrics v0.9.0
 	github.com/sony/gobreaker v0.4.1
+	github.com/sony/sonyflake v1.0.0
 	github.com/ugorji/go v1.1.14 // indirect
 	go.opencensus.io v0.23.0
 	golang.org/x/net v0.0.0-20211015210444-4f30a5c0130f // indirect

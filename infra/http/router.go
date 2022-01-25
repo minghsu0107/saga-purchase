@@ -3,10 +3,13 @@ package http
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	pb "github.com/minghsu0107/saga-pb"
+
+	"path"
 
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/minghsu0107/saga-purchase/config"
@@ -49,13 +52,16 @@ func (h *PurchaseResultStreamHandler) Validate(r *http.Request, msg *message.Mes
 	if err != nil {
 		return
 	}
-
+	purchaseID, err := strconv.ParseUint(path.Base(r.URL.Path), 10, 64)
+	if err != nil {
+		return
+	}
 	customerID, valid := r.Context().Value(config.CustomerKey).(uint64)
 	if !valid {
 		return
 	}
 
-	if customerID == purchaseResult.CustomerId {
+	if (customerID == purchaseResult.CustomerId) && (purchaseID == purchaseResult.PurchaseId) {
 		ok = true
 	}
 	return
@@ -110,7 +116,7 @@ func (h *PurchasingHandler) CreatePurchase(c *gin.Context) {
 		response(c, http.StatusUnauthorized, presenter.ErrUnautorized)
 		return
 	}
-	err := h.PurchasingSvc.CreatePurchase(c.Request.Context(), customerID, &curPurchase)
+	purchaseID, err := h.PurchasingSvc.CreatePurchase(c.Request.Context(), customerID, &curPurchase)
 	switch err {
 	case purchase.ErrInvalidCartItemAmount, purchase.ErrUnkownProductStatus:
 		response(c, http.StatusBadRequest, presenter.ErrInvalidParam)
@@ -118,7 +124,9 @@ func (h *PurchasingHandler) CreatePurchase(c *gin.Context) {
 	case purchase.ErrProductNotfound:
 		response(c, http.StatusNotFound, purchase.ErrProductNotfound)
 	case nil:
-		c.JSON(http.StatusCreated, presenter.OkMsg)
+		c.JSON(http.StatusCreated, &presenter.PurchaseCreation{
+			PurchaseID: purchaseID,
+		})
 		return
 	default:
 		response(c, http.StatusInternalServerError, presenter.ErrServer)

@@ -8,6 +8,11 @@ type PurchaseResult struct {
 	Timestamp  int64  `json:"timestamp"`
 }
 
+// PurchaseCreation response payload
+type PurchaseCreation struct {
+	PurchaseID uint64 `json:"purchase_id"`
+}
+
 // CartItem is the JSON request that represents an order
 type CartItem struct {
 	ProductID uint64 `json:"product_id" binding:"required"`

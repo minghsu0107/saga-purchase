@@ -6,6 +6,7 @@ import (
 	conf "github.com/minghsu0107/saga-purchase/config"
 	"github.com/minghsu0107/saga-purchase/domain/model"
 	"github.com/minghsu0107/saga-purchase/infra/http/presenter"
+	"github.com/minghsu0107/saga-purchase/pkg"
 	"github.com/minghsu0107/saga-purchase/repo"
 	log "github.com/sirupsen/logrus"
 )
@@ -13,16 +14,18 @@ import (
 // PurchasingServiceImpl implements PurchasingService interface
 type PurchasingServiceImpl struct {
 	logger         *log.Entry
+	sf             pkg.IDGenerator
 	purchasingRepo repo.PurchasingRepository
 	productRepo    repo.ProductRepository
 }
 
 // NewPurchasingService is the factory of PurchasingService
-func NewPurchasingService(config *conf.Config, purchasingRepo repo.PurchasingRepository, productRepo repo.ProductRepository) PurchasingService {
+func NewPurchasingService(config *conf.Config, sf pkg.IDGenerator, purchasingRepo repo.PurchasingRepository, productRepo repo.ProductRepository) PurchasingService {
 	return &PurchasingServiceImpl{
 		logger: config.Logger.ContextLogger.WithFields(log.Fields{
 			"type": "service:PurchasingService",
 		}),
+		sf:             sf,
 		purchasingRepo: purchasingRepo,
 		productRepo:    productRepo,
 	}
@@ -54,7 +57,7 @@ func (svc *PurchasingServiceImpl) CheckProducts(ctx context.Context, cartItems *
 }
 
 // CreatePurchase passes a CreatePurchase command to orchestrator
-func (svc *PurchasingServiceImpl) CreatePurchase(ctx context.Context, customerID uint64, purchase *presenter.Purchase) error {
+func (svc *PurchasingServiceImpl) CreatePurchase(ctx context.Context, customerID uint64, purchase *presenter.Purchase) (uint64, error) {
 	var cartItems []model.CartItem
 	for _, cartItem := range *(purchase.CartItems) {
 		cartItems = append(cartItems, model.CartItem{
@@ -64,13 +67,18 @@ func (svc *PurchasingServiceImpl) CreatePurchase(ctx context.Context, customerID
 	}
 	productStatuses, err := svc.CheckProducts(ctx, &cartItems)
 	if err != nil {
-		return err
+		return 0, err
+	}
+	purchaseID, err := svc.sf.NextID()
+	if err != nil {
+		return 0, err
 	}
 	var amount int64 = 0
 	for i, productStatus := range *productStatuses {
 		amount += cartItems[i].Amount * productStatus.Price
 	}
 	newPurchase := &model.Purchase{
+		ID: purchaseID,
 		Order: &model.Order{
 			CustomerID: customerID,
 			CartItems:  &cartItems,
@@ -83,7 +91,7 @@ func (svc *PurchasingServiceImpl) CreatePurchase(ctx context.Context, customerID
 
 	if err := svc.purchasingRepo.CreatePurchase(ctx, newPurchase); err != nil {
 		svc.logger.Error(err.Error())
-		return err
+		return 0, err
 	}
-	return nil
+	return purchaseID, nil
 }
