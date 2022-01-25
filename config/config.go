@@ -19,32 +19,42 @@ type Config struct {
 	PromPort       string          `yaml:"promPort" envconfig:"PROM_PORT"`
 	OcAgentHost    string          `yaml:"ocAgentHost" envconfig:"OC_AGENT_HOST"`
 	Resolver       string          `yaml:"resolver" envconfig:"RESOLVER"`
-	NATS           *NATS           `yaml:"nats"`
+	NATSConfig     *NATSConfig     `yaml:"natsConfig"`
 	RedisConfig    *RedisConfig    `yaml:"redisConfig"`
 	RPCEndpoints   *RPCEndpoints   `yaml:"rpcEndpoints"`
 	ServiceOptions *ServiceOptions `yaml:"serviceOptions"`
 	Logger         *Logger
 }
 
-// NATS wraps NATS client configurations
-type NATS struct {
-	ClusterID       string `yaml:"clusterID" envconfig:"NATS_CLUSTER_ID"`
-	URL             string `yaml:"url" envconfig:"NATS_URL"`
-	ClientID        string `yaml:"clientID" envconfig:"NATS_CLIENT_ID"`
-	QueueGroup      string `yaml:"queueGroup" envconfig:"NATS_QUEUE_GROUP"`
-	DurableName     string `yaml:"durableName" envconfig:"NATS_DURABLE_NAME"`
-	SubscriberCount int    `yaml:"subscriberCount" envconfig:"NATS_SUBSCRIBER_COUNT"`
+// NATSConfig wraps NATS client configurations
+type NATSConfig struct {
+	ClusterID  string          `yaml:"clusterID" envconfig:"NATS_CLUSTER_ID"`
+	ClientID   string          `yaml:"clientID" envconfig:"NATS_CLIENT_ID"`
+	URL        string          `yaml:"url" envconfig:"NATS_URL"`
+	Subscriber *NATSSubscriber `yaml:"subscriber"`
+}
+
+type NATSSubscriber struct {
+	QueueGroup  string `yaml:"queueGroup" envconfig:"NATS_SUBSCRIBER_QUEUE_GROUP"`
+	DurableName string `yaml:"durableName" envconfig:"NATS_SUBSCRIBER_DURABLE_NAME"`
+	Count       int    `yaml:"count" envconfig:"NATS_SUBSCRIBER_COUNT"`
 }
 
 // RedisConfig is redis config type
 type RedisConfig struct {
-	Addrs              string `yaml:"addrs" envconfig:"REDIS_ADDRS"`
-	Password           string `yaml:"password" envconfig:"REDIS_PASSWORD"`
-	DB                 int    `yaml:"db" envconfig:"REDIS_DB"`
-	PoolSize           int    `yaml:"poolSize" envconfig:"REDIS_POOL_SIZE"`
-	MaxRetries         int    `yaml:"maxRetries" envconfig:"REDIS_MAX_RETRIES"`
-	ExpirationSeconds  int64  `yaml:"expirationSeconds" envconfig:"REDIS_EXPIRATION_SECONDS"`
-	IdleTimeoutSeconds int64  `yaml:"idleTimeoutSeconds" envconfig:"REDIS_IDLE_TIMEOUT_SECONDS"`
+	Addrs              string           `yaml:"addrs" envconfig:"REDIS_ADDRS"`
+	Password           string           `yaml:"password" envconfig:"REDIS_PASSWORD"`
+	DB                 int              `yaml:"db" envconfig:"REDIS_DB"`
+	PoolSize           int              `yaml:"poolSize" envconfig:"REDIS_POOL_SIZE"`
+	MaxRetries         int              `yaml:"maxRetries" envconfig:"REDIS_MAX_RETRIES"`
+	ExpirationSeconds  int64            `yaml:"expirationSeconds" envconfig:"REDIS_EXPIRATION_SECONDS"`
+	IdleTimeoutSeconds int64            `yaml:"idleTimeoutSeconds" envconfig:"REDIS_IDLE_TIMEOUT_SECONDS"`
+	Subscriber         *RedisSubscriber `yaml:"subscriber"`
+}
+
+type RedisSubscriber struct {
+	ConsumerID    string `yaml:"consumerID" envconfig:"REDIS_SUBSCRIBER_CONSUMER_ID"`
+	ConsumerGroup string `yaml:"consumerGroup" envconfig:"REDIS_SUBSCRIBER_CONSUMER_GROUP"`
 }
 
 // RPCEndpoints wraps all rpc server urls
@@ -71,8 +81,11 @@ func NewConfig() (*Config, error) {
 	}
 	config.Logger = newLogger(config.App)
 	log.SetOutput(config.Logger.Writer)
-	if config.NATS.ClientID == "" {
-		config.NATS.ClientID = watermill.NewShortUUID()
+	if config.NATSConfig.ClientID == "" {
+		config.NATSConfig.ClientID = watermill.NewShortUUID()
+	}
+	if config.RedisConfig.Subscriber.ConsumerID == "" {
+		config.RedisConfig.Subscriber.ConsumerID = watermill.NewShortUUID()
 	}
 	config.ServiceOptions.Timeout = time.Duration(config.ServiceOptions.TimeoutSecond) * time.Second
 	return &config, nil

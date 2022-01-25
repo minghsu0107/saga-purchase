@@ -18,10 +18,10 @@ func NewNATSPublisher(config *conf.Config) (message.Publisher, error) {
 	var err error
 	Publisher, err = nats.NewStreamingPublisher(
 		nats.StreamingPublisherConfig{
-			ClusterID: config.NATS.ClusterID,
-			ClientID:  config.NATS.ClientID + "_publisher",
+			ClusterID: config.NATSConfig.ClusterID,
+			ClientID:  config.NATSConfig.ClientID + "_publisher",
 			StanOptions: []stan.Option{
-				stan.NatsURL(config.NATS.URL),
+				stan.NatsURL(config.NATSConfig.URL),
 			},
 			Marshaler: nats.GobMarshaler{},
 		},
