@@ -9,7 +9,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"strconv"
 	"testing"
 	"time"
 
@@ -126,7 +125,7 @@ var _ = Describe("router", func() {
 	var purchaseID uint64 = 13132
 	BeforeEach(func() {
 		purchasingEndpoint = "/api/purchase"
-		purchaseResultEndpoint = "/api/purchase/result/" + strconv.FormatUint(purchaseID, 10)
+		purchaseResultEndpoint = "/api/purchase/result"
 	})
 	Describe("test unauthorized request", func() {
 		It("should return 401 unauthorized when trying to create purchase", func() {
