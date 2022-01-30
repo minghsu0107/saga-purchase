@@ -19,6 +19,8 @@ make build
 ```
 Start the service:
 ```bash
+REDIS_ADDRS=redis-node1:7000,redis-node2:7001 \
+REDIS_PASSWORD=pass.123 \
 NATS_URL=nats://nats-streaming:4222 \
 NATS_CLUSTER_ID=test-cluster \
 RPC_AUTH_SVC_HOST=saga-account:8000 \
@@ -26,10 +28,13 @@ RPC_PRODUCT_SVC_HOST=saga-product:8000 \
 OC_AGENT_HOST=oc-collector:55678 \
 ./server
 ```
+- `REDIS_ADDRS`: list of Redis addresses
+- `REDIS_PASSWORD`: Redis password
 - `NATS_URL`: NATS Streaming server URL.
 - `NATS_CLUSTER_ID`: NATS Cluster ID
 - `RPC_AUTH_SVC_HOST`: gRPC account service host
 - `RPC_PRODUCT_SVC_HOST`: gRPC product service host
+- `OC_AGENT_HOST`: OpenCensus Agent Host
 ## Running in Docker
 See [docker-compose example](https://github.com/minghsu0107/saga-example/blob/main/docker-compose.yaml) for details.
 ## Exported Metrics
