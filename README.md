@@ -2,7 +2,7 @@
 Purchase service of the [saga pattern implementation](https://github.com/minghsu0107/saga-example).
 
 Features:
-- Realtime event-driven subscription using [NATS Streaming](https://docs.nats.io/nats-streaming-concepts/intro) and [server-sent events (SSE)](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events)
+- Realtime event-driven subscription using [Redis Stream](https://redis.io/topics/streams-intro) and [server-sent events (SSE)](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events)
 - Prometheus metrics
 - Distributed tracing exporter
   - HTTP server 
