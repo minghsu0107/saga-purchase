@@ -50,7 +50,7 @@ func NewRedisSubscriber(config *conf.Config) (message.Subscriber, error) {
 			// MaxIdleTime: time.Second * 60,
 		},
 		RedisClient,
-		&redistream.DefaultMarshaler{},
+		&redistream.DefaultMarshaller{},
 		logger,
 	)
 	if err != nil {

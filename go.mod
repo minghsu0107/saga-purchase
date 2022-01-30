@@ -17,7 +17,7 @@ require (
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/minghsu0107/saga-pb v0.5.5
-	github.com/minghsu0107/watermill-redistream v0.0.0-20220125171345-5a5411b0758f
+	github.com/minghsu0107/watermill-redistream v1.0.0
 	github.com/nats-io/stan.go v0.8.3
 	github.com/onsi/ginkgo v1.16.4
 	github.com/onsi/gomega v1.16.0
