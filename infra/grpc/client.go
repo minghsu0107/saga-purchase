@@ -3,14 +3,13 @@ package grpc
 import (
 	"context"
 	"fmt"
-	"sync"
 	"time"
 
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_retry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
 	conf "github.com/minghsu0107/saga-purchase/config"
-	"github.com/sercand/kuberesolver/v3"
 	log "github.com/sirupsen/logrus"
-	"go.opencensus.io/plugin/ocgrpc"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/keepalive"
@@ -21,10 +20,6 @@ var (
 	AuthClientConn *AuthConn
 	// ProductClientConn grpc connection
 	ProductClientConn *ProductConn
-
-	// KubernetesResolver name
-	KubernetesResolver string = "kubernetes"
-	once               sync.Once
 )
 
 // AuthConn is a wrapper for Auth grpc connection
@@ -40,7 +35,7 @@ type ProductConn struct {
 // NewAuthConn returns a grpc client connection for AuthRepository
 func NewAuthConn(config *conf.Config) (*AuthConn, error) {
 	log.Info("connecting to grpc auth service...")
-	conn, err := newGRPCConn(config.Resolver, config.RPCEndpoints.AuthSvcHost, config.OcAgentHost)
+	conn, err := newGRPCConn(config.RPCEndpoints.AuthSvcHost)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +48,7 @@ func NewAuthConn(config *conf.Config) (*AuthConn, error) {
 // NewProductConn returns a grpc client connection for ProductRepository
 func NewProductConn(config *conf.Config) (*ProductConn, error) {
 	log.Info("connecting to grpc product service...")
-	conn, err := newGRPCConn(config.Resolver, config.RPCEndpoints.ProductSvcHost, config.OcAgentHost)
+	conn, err := newGRPCConn(config.RPCEndpoints.ProductSvcHost)
 	if err != nil {
 		return nil, err
 	}
@@ -63,18 +58,11 @@ func NewProductConn(config *conf.Config) (*ProductConn, error) {
 	return ProductClientConn, nil
 }
 
-func newGRPCConn(resolver, svcHost, ocAgentHost string) (*grpc.ClientConn, error) {
+func newGRPCConn(svcHost string) (*grpc.ClientConn, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
-	var scheme string
-
-	if resolver == KubernetesResolver {
-		once.Do(kuberesolver.RegisterInCluster)
-		scheme = "kubernetes"
-	} else {
-		scheme = "dns"
-	}
+	var scheme = "dns"
 
 	retryOpts := []grpc_retry.CallOption{
 		// generate waits between 900ms to 1100ms
@@ -84,10 +72,6 @@ func newGRPCConn(resolver, svcHost, ocAgentHost string) (*grpc.ClientConn, error
 
 	dialOpts := []grpc.DialOption{
 		grpc.WithInsecure(),
-	}
-
-	if ocAgentHost != "" {
-		dialOpts = append(dialOpts, grpc.WithStatsHandler(new(ocgrpc.ClientHandler)))
 	}
 
 	dialOpts = append(dialOpts,
@@ -100,8 +84,14 @@ func newGRPCConn(resolver, svcHost, ocAgentHost string) (*grpc.ClientConn, error
 			Timeout:             time.Second,      // wait 1 second for ping ack before considering the connection dead
 			PermitWithoutStream: true,             // send pings even without active streams
 		}),
-		grpc.WithStreamInterceptor(grpc_retry.StreamClientInterceptor(retryOpts...)),
-		grpc.WithUnaryInterceptor(grpc_retry.UnaryClientInterceptor(retryOpts...)),
+		grpc.WithStreamInterceptor(grpc_middleware.ChainStreamClient(
+			otelgrpc.StreamClientInterceptor(),
+			grpc_retry.StreamClientInterceptor(retryOpts...),
+		)),
+		grpc.WithUnaryInterceptor(grpc_middleware.ChainUnaryClient(
+			otelgrpc.UnaryClientInterceptor(),
+			grpc_retry.UnaryClientInterceptor(retryOpts...),
+		)),
 		//grpc.WithBlock(),
 	)
 

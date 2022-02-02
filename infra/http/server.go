@@ -13,11 +13,12 @@ import (
 	metrics "github.com/slok/go-http-metrics/metrics/prometheus"
 	prommiddleware "github.com/slok/go-http-metrics/middleware"
 	ginmiddleware "github.com/slok/go-http-metrics/middleware/gin"
-	"go.opencensus.io/plugin/ochttp"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
 // Server is the http wrapper
 type Server struct {
+	App            string
 	Port           string
 	Engine         *gin.Engine
 	Router         *Router
@@ -54,6 +55,7 @@ func NewEngine(config *conf.Config) *gin.Engine {
 // NewServer is the factory for server instance
 func NewServer(config *conf.Config, engine *gin.Engine, router *Router, sseRouter *pkg.SSERouter, jwtAuthChecker *middleware.JWTAuthChecker) *Server {
 	return &Server{
+		App:            config.App,
 		Port:           config.HTTPPort,
 		Engine:         engine,
 		Router:         router,
@@ -85,10 +87,8 @@ func (s *Server) Run() error {
 	s.RegisterRoutes()
 	addr := ":" + s.Port
 	s.svr = &http.Server{
-		Addr: addr,
-		Handler: &ochttp.Handler{
-			Handler: s.Engine,
-		},
+		Addr:    addr,
+		Handler: otelhttp.NewHandler(s.Engine, s.App+"_http"),
 	}
 	log.Infoln("listening on ", addr)
 	err := s.svr.ListenAndServe()

@@ -10,22 +10,15 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/minghsu0107/saga-purchase/dep"
-	"github.com/minghsu0107/saga-purchase/infra/broker"
-	"github.com/minghsu0107/saga-purchase/infra/grpc"
 )
 
 func main() {
-	errs := make(chan error, 1)
-
 	server, err := dep.InitializeServer()
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer broker.Publisher.Close()
-	defer broker.Subscriber.Close()
-	defer grpc.AuthClientConn.Conn.Close()
-	defer grpc.ProductClientConn.Conn.Close()
 
+	errs := make(chan error, 1)
 	go func() {
 		errs <- server.Run()
 	}()

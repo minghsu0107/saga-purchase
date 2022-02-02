@@ -30,6 +30,12 @@ require (
 	github.com/sony/sonyflake v1.0.0
 	github.com/ugorji/go v1.1.14 // indirect
 	go.opencensus.io v0.23.0
+	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.28.0
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.28.0
+	go.opentelemetry.io/otel v1.3.0
+	go.opentelemetry.io/otel/exporters/jaeger v1.3.0
+	go.opentelemetry.io/otel/sdk v1.3.0
+	go.opentelemetry.io/otel/trace v1.3.0
 	golang.org/x/net v0.0.0-20211015210444-4f30a5c0130f // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
 	golang.org/x/sys v0.0.0-20220114195835-da31bd327af9 // indirect
@@ -37,7 +43,7 @@ require (
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20210524171403-669157292da3 // indirect
-	google.golang.org/grpc v1.38.0
+	google.golang.org/grpc v1.42.0
 	google.golang.org/protobuf v1.26.0
 	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c
 )

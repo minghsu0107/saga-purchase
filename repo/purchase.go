@@ -12,8 +12,7 @@ import (
 	conf "github.com/minghsu0107/saga-purchase/config"
 	"github.com/minghsu0107/saga-purchase/domain/model"
 
-	"go.opencensus.io/trace"
-	"go.opencensus.io/trace/propagation"
+	"go.opentelemetry.io/otel"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -36,7 +35,8 @@ func NewPurchasingRepository(publisher message.Publisher) PurchasingRepository {
 
 // CreatePurchase publish a CreatePurchase command to the message broker
 func (r *PurchasingRepositoryImpl) CreatePurchase(ctx context.Context, purchase *model.Purchase) error {
-	_, span := trace.StartSpan(ctx, "event.CreatePurchase")
+	tr := otel.Tracer("createPurchase")
+	ctx, span := tr.Start(ctx, "event.CreatePurchase")
 	defer span.End()
 
 	var purchasedItems []*pb.PurchasedItem
@@ -69,7 +69,7 @@ func (r *PurchasingRepositoryImpl) CreatePurchase(ctx context.Context, purchase 
 	}
 
 	msg := message.NewMessage(watermill.NewUUID(), payload)
-	msg.Metadata.Set(conf.SpanContextKey, string(propagation.Binary(span.SpanContext())))
+	msg.Metadata.Set(conf.SpanContextKey, SpanContextToW3C(ctx))
 	middleware.SetCorrelationID(watermill.NewUUID(), msg)
 
 	if err := r.publisher.Publish(conf.PurchaseTopic, msg); err != nil {

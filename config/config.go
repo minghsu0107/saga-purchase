@@ -17,8 +17,7 @@ type Config struct {
 	GinMode        string          `yaml:"ginMode" envconfig:"GIN_MODE"`
 	HTTPPort       string          `yaml:"httpPort" envconfig:"HTTP_PORT"`
 	PromPort       string          `yaml:"promPort" envconfig:"PROM_PORT"`
-	OcAgentHost    string          `yaml:"ocAgentHost" envconfig:"OC_AGENT_HOST"`
-	Resolver       string          `yaml:"resolver" envconfig:"RESOLVER"`
+	JaegerUrl      string          `yaml:"jaegerUrl" envconfig:"JAEGER_URL"`
 	NATSConfig     *NATSConfig     `yaml:"natsConfig"`
 	RedisConfig    *RedisConfig    `yaml:"redisConfig"`
 	RPCEndpoints   *RPCEndpoints   `yaml:"rpcEndpoints"`
