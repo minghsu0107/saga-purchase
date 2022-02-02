@@ -4,7 +4,7 @@ Purchase service of the [saga pattern implementation](https://github.com/minghsu
 Features:
 - Realtime event-driven subscription using [Redis Stream](https://redis.io/topics/streams-intro) and [server-sent events (SSE)](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events)
 - Prometheus metrics
-- Distributed tracing exporter
+- Distributed tracing with [OpenTelemetry](https://opentelemetry.io)
   - HTTP server 
   - gPRC client
 - Comprehensive application struture with domain-driven design (DDD), decoupling service implementations from configurations and transports
