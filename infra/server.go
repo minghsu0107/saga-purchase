@@ -50,10 +50,18 @@ func (s *Server) GracefulStop(ctx context.Context, done chan bool) {
 			log.Error(err)
 		}
 	}
-	infra_broker.Publisher.Close()
-	infra_broker.Subscriber.Close()
-	infra_grpc.AuthClientConn.Conn.Close()
-	infra_grpc.ProductClientConn.Conn.Close()
+	if err = infra_broker.Publisher.Close(); err != nil {
+		log.Error(err)
+	}
+	if err = infra_broker.Subscriber.Close(); err != nil {
+		log.Error(err)
+	}
+	if err = infra_grpc.AuthClientConn.Conn.Close(); err != nil {
+		log.Error(err)
+	}
+	if err = infra_grpc.ProductClientConn.Conn.Close(); err != nil {
+		log.Error(err)
+	}
 
 	log.Info("gracefully shutdowned")
 	done <- true
