@@ -9,7 +9,7 @@ import (
 	"github.com/ThreeDotsLabs/watermill/pubsub/gochannel"
 	"github.com/go-chi/render"
 	"github.com/pkg/errors"
-	"go.opencensus.io/trace"
+	"go.opentelemetry.io/otel"
 )
 
 type StreamAdapter interface {
@@ -187,7 +187,8 @@ func (h sseHandler) handleEventStream(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h sseHandler) processMessage(w http.ResponseWriter, r *http.Request, msg *message.Message) (interface{}, bool) {
-	_, span := trace.StartSpan(msg.Context(), r.URL.Path)
+	tr := otel.Tracer("streamPurchaseResult")
+	_, span := tr.Start(msg.Context(), "event.StreamPurchaseResult")
 	defer span.End()
 
 	ok := h.streamAdapter.Validate(r, msg)
