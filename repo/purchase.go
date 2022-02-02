@@ -69,7 +69,7 @@ func (r *PurchasingRepositoryImpl) CreatePurchase(ctx context.Context, purchase 
 	}
 
 	msg := message.NewMessage(watermill.NewUUID(), payload)
-	msg.Metadata.Set(conf.SpanContextKey, SpanContextToW3C(ctx))
+	msg.Metadata.Set(conf.SpanContextKey, spanContextToW3C(ctx))
 	middleware.SetCorrelationID(watermill.NewUUID(), msg)
 
 	if err := r.publisher.Publish(conf.PurchaseTopic, msg); err != nil {

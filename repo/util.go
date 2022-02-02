@@ -20,7 +20,7 @@ func decodeGRPCResponse(_ context.Context, grpcReply interface{}) (interface{}, 
 	return grpcReply, nil
 }
 
-func SpanContextToW3C(ctx context.Context) string {
+func spanContextToW3C(ctx context.Context) string {
 	sc := trace.SpanContextFromContext(ctx)
 	if !sc.IsValid() {
 		return ""
