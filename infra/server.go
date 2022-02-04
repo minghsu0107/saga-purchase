@@ -25,7 +25,7 @@ func NewServer(httpServer *infra_http.Server, obsInjector *infra_observe.Observi
 
 // Run server
 func (s *Server) Run() error {
-	errs := make(chan error, 1)
+	errs := make(chan error, 2)
 	s.ObsInjector.Register(errs)
 	err := <-errs
 	if err != nil {
