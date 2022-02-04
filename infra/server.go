@@ -27,10 +27,14 @@ func NewServer(httpServer *infra_http.Server, obsInjector *infra_observe.Observi
 func (s *Server) Run() error {
 	errs := make(chan error, 1)
 	s.ObsInjector.Register(errs)
+	err := <-errs
+	if err != nil {
+		return err
+	}
 	go func() {
 		errs <- s.HTTPServer.Run()
 	}()
-	err := <-errs
+	err = <-errs
 	if err != nil {
 		return err
 	}
