@@ -106,7 +106,7 @@ func (h *PurchasingHandler) CreatePurchase(c *gin.Context) {
 	}
 	customerID, ok := c.Request.Context().Value(config.CustomerKey).(uint64)
 	if !ok {
-		response(c, http.StatusUnauthorized, presenter.ErrUnautorized)
+		response(c, http.StatusUnauthorized, presenter.ErrUnauthorized)
 		return
 	}
 	purchaseID, err := h.PurchasingSvc.CreatePurchase(c.Request.Context(), customerID, &curPurchase)

@@ -13,8 +13,8 @@ import (
 	"time"
 
 	"github.com/ThreeDotsLabs/watermill/message"
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/minghsu0107/saga-purchase/infra/http/middleware"
 	"github.com/minghsu0107/saga-purchase/infra/http/presenter"
 	mock_repo "github.com/minghsu0107/saga-purchase/mock/repo"
