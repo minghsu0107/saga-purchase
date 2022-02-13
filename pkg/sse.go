@@ -8,8 +8,15 @@ import (
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/ThreeDotsLabs/watermill/pubsub/gochannel"
 	"github.com/go-chi/render"
+	conf "github.com/minghsu0107/saga-purchase/config"
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/propagation"
+)
+
+var (
+	TraceContext      = propagation.TraceContext{}
+	TraceparentHeader = TraceContext.Fields()[0]
 )
 
 type StreamAdapter interface {
@@ -187,8 +194,11 @@ func (h sseHandler) handleEventStream(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h sseHandler) processMessage(w http.ResponseWriter, r *http.Request, msg *message.Message) (interface{}, bool) {
+	carrier := make(propagation.HeaderCarrier)
+	carrier.Set(TraceparentHeader, msg.Metadata.Get(conf.SpanContextKey))
+	parentCtx := TraceContext.Extract(context.Background(), carrier)
 	tr := otel.Tracer("streamPurchaseResult")
-	_, span := tr.Start(msg.Context(), "event.StreamPurchaseResult")
+	_, span := tr.Start(parentCtx, "event.StreamPurchaseResult")
 	defer span.End()
 
 	ok := h.streamAdapter.Validate(r, msg)
