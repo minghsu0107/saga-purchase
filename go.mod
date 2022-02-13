@@ -11,6 +11,7 @@ require (
 	github.com/go-chi/render v1.0.1
 	github.com/go-kit/kit v0.10.0
 	github.com/go-playground/validator/v10 v10.4.1 // indirect
+	github.com/go-redis/redis/extra/redisotel/v8 v8.11.4
 	github.com/go-redis/redis/v8 v8.11.4
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/golang-jwt/jwt/v4 v4.3.0
