@@ -36,7 +36,7 @@ func NewRedisSubscriber(config *conf.Config) (message.Subscriber, error) {
 	if err == redis.Nil || err != nil {
 		return nil, err
 	}
-	RedisClient.AddHook(redisotel.TracingHook{})
+	RedisClient.AddHook(redisotel.NewTracingHook())
 	config.Logger.ContextLogger.WithField("type", "setup:redis").Info("successful redis connection: " + pong)
 
 	Subscriber, err = redistream.NewSubscriber(
