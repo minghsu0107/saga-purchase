@@ -30,7 +30,7 @@ func InitializeServer() (*infra.Server, error) {
 		infra_http.NewPurchaseResultStreamHandler,
 		infra_http.NewPurchasingHandler,
 
-		infra_observe.NewObservibilityInjector,
+		infra_observe.NewObservabilityInjector,
 
 		middleware.NewJWTAuthChecker,
 

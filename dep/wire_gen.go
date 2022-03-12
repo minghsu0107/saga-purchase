@@ -62,10 +62,10 @@ func InitializeServer() (*infra.Server, error) {
 	authRepository := repo.NewAuthRepository(authConn, configConfig)
 	jwtAuthChecker := middleware.NewJWTAuthChecker(configConfig, authRepository)
 	server := http.NewServer(configConfig, engine, router, sseRouter, jwtAuthChecker)
-	observibilityInjector, err := pkg2.NewObservibilityInjector(configConfig)
+	observabilityInjector, err := pkg2.NewObservabilityInjector(configConfig)
 	if err != nil {
 		return nil, err
 	}
-	infraServer := infra.NewServer(server, observibilityInjector)
+	infraServer := infra.NewServer(server, observabilityInjector)
 	return infraServer, nil
 }
