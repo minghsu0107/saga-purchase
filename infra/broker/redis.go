@@ -4,15 +4,14 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/ThreeDotsLabs/watermill/components/metrics"
 	"github.com/ThreeDotsLabs/watermill/message"
-	"github.com/go-redis/redis/extra/redisotel/v8"
-	"github.com/go-redis/redis/v8"
 	conf "github.com/minghsu0107/saga-purchase/config"
-	redistream "github.com/minghsu0107/watermill-redistream/pkg/redis"
+	"github.com/minghsu0107/watermill-redisstream/pkg/redisstream"
 	prom "github.com/prometheus/client_golang/prometheus"
+	"github.com/redis/go-redis/extra/redisotel/v9"
+	"github.com/redis/go-redis/v9"
 )
 
 var (
@@ -28,7 +27,6 @@ func NewRedisSubscriber(config *conf.Config) (message.Subscriber, error) {
 		Password:      config.RedisConfig.Password,
 		PoolSize:      config.RedisConfig.PoolSize,
 		MaxRetries:    config.RedisConfig.MaxRetries,
-		IdleTimeout:   time.Duration(config.RedisConfig.IdleTimeoutSeconds) * time.Second,
 		ReadOnly:      true,
 		RouteRandomly: true,
 	})
@@ -36,13 +34,14 @@ func NewRedisSubscriber(config *conf.Config) (message.Subscriber, error) {
 	if err == redis.Nil || err != nil {
 		return nil, err
 	}
-	RedisClient.AddHook(redisotel.NewTracingHook())
+	redisotel.InstrumentTracing(RedisClient)
 	config.Logger.ContextLogger.WithField("type", "setup:redis").Info("successful redis connection: " + pong)
 
-	Subscriber, err = redistream.NewSubscriber(
-		ctx,
-		redistream.SubscriberConfig{
-			Consumer: config.RedisConfig.Subscriber.ConsumerID,
+	Subscriber, err = redisstream.NewSubscriber(
+		redisstream.SubscriberConfig{
+			Client:       RedisClient,
+			Unmarshaller: &redisstream.DefaultMarshallerUnmarshaller{},
+			Consumer:     config.RedisConfig.Subscriber.ConsumerID,
 			// use fan-out mode if leaved empty
 			ConsumerGroup: config.RedisConfig.Subscriber.ConsumerGroup,
 
@@ -51,8 +50,6 @@ func NewRedisSubscriber(config *conf.Config) (message.Subscriber, error) {
 			// configure this only when ConsumerGroup is not empty
 			// MaxIdleTime: time.Second * 60,
 		},
-		RedisClient,
-		&redistream.DefaultMarshaller{},
 		logger,
 	)
 	if err != nil {
