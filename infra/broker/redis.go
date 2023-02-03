@@ -56,7 +56,7 @@ func NewRedisSubscriber(config *conf.Config) (message.Subscriber, error) {
 		return nil, err
 	}
 
-	registry, ok := prom.DefaultGatherer.(*prom.Registry)
+	registry, ok := prom.DefaultRegisterer.(*prom.Registry)
 	if !ok {
 		return nil, fmt.Errorf("prometheus type casting error")
 	}
